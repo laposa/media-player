@@ -23,3 +23,5 @@ rootProject.name = "Laposa Video Player"
 include(":mobile")
 include(":tv")
 include(":common")
+include(":domain")
+include(":bonsoir")

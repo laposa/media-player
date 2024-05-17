@@ -60,7 +60,6 @@ configurations.all {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.androidx.compose.bom))
@@ -71,7 +70,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation(project(":common"))
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -85,4 +83,7 @@ dependencies {
     implementation(libs.javapoet)
     implementation(libs.glide)
     implementation(libs.androidx.compose.runtime.livedata)
+
+    implementation(project(":common"))
+    implementation(project(":domain"))
 }

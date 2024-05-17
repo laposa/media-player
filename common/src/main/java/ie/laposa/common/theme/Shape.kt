@@ -1,8 +1,8 @@
 package ie.laposa.common.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Shapes
 
 val VideoPlayerShapes = Shapes(
     small = RoundedCornerShape(percent = 50),

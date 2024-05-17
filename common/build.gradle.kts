@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
+
 
 android {
     namespace = "ie.laposa.common"
@@ -30,20 +33,42 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
 }
 
 dependencies {
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.text)
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.tv.foundation)
+    implementation(libs.androidx.tv.material)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.google.dagger.hilt)
+    kapt(libs.google.dagger.hilt.compiler)
+    implementation(libs.javapoet)
+    implementation(libs.glide)
+    implementation(libs.androidx.compose.runtime.livedata)
+
+    implementation(project(":domain"))
+    implementation(project(":bonsoir"))
 }
