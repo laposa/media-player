@@ -46,5 +46,5 @@ dependencies {
     implementation(libs.google.dagger.hilt)
     kapt(libs.google.dagger.hilt.compiler)
     implementation(project(":bonsoir"))
-    implementation("com.hierynomus:smbj:0.13.0")
+    implementation(libs.dcerpc)
 }

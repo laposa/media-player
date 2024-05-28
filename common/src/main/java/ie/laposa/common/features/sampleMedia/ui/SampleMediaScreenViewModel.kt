@@ -7,13 +7,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ie.laposa.common.features.common.ui.SavedStateHandleViewModel
 import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.mediaSource.MediaSourceService
+import ie.laposa.domain.mediaSource.model.MediaSource
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SampleMediaScreenViewModel @Inject constructor(
     private val savedStateHandleViewModel: SavedStateHandleViewModel,
-    private val mediaSourceService: MediaSourceService,
 ) : ViewModel() {
     private val _media = mutableStateListOf(
         Media(
@@ -40,15 +40,7 @@ class SampleMediaScreenViewModel @Inject constructor(
 
     val media = _media
 
-    val mediaSources = mediaSourceService.mediaSources
-
     fun onMediaSelected(media: Media) {
         savedStateHandleViewModel.setSelectedMedia(media)
-    }
-
-    fun fetchMediaSources() {
-        viewModelScope.launch {
-            mediaSourceService.fetchMediaSources()
-        }
     }
 }

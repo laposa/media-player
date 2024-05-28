@@ -2,6 +2,7 @@ package ie.laposa.domain.mediaSource.model
 
 import android.net.nsd.NsdServiceInfo
 import android.os.Parcelable
+import ie.laposa.domain.zeroConf.ZeroConfServiceType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -15,8 +16,8 @@ data class MediaSource(
             return MediaSource(
                 type = MediaSourceType.ZeroConf.fromId(service.serviceType),
                 displayName = service.serviceName,
-                sourceName = when(service.serviceType) {
-                    "_smb._tcp." -> "SMB"
+                sourceName = when {
+                   ZeroConfServiceType.SMB.isType(service.serviceType) -> "SMB"
                     else -> service.serviceType
                 },
             )
@@ -25,21 +26,21 @@ data class MediaSource(
 }
 
 @Parcelize
-sealed class MediaSourceType(open val id: String): Parcelable {
+sealed class MediaSourceType(): Parcelable {
     @Parcelize
-    sealed class ZeroConf(override val id: String) : MediaSourceType(id) {
-        data object SMB : ZeroConf("_smb._tcp.")
-        data object FTP : ZeroConf("_ftp._tcp.")
-        data object WebDAV : ZeroConf("_webdav._tcp.")
-        data object NFS : ZeroConf("_nfs._tcp.")
+    sealed class ZeroConf(val type: ZeroConfServiceType) : MediaSourceType() {
+        data object SMB : ZeroConf(ZeroConfServiceType.SMB)
+        data object FTP : ZeroConf(ZeroConfServiceType.FTP)
+        data object WebDAV : ZeroConf(ZeroConfServiceType.WEBDAV)
+        data object NFS : ZeroConf(ZeroConfServiceType.NFS)
 
         companion object {
             fun fromId(id: String): ZeroConf {
-                return when (id) {
-                    SMB.id -> SMB
-                    FTP.id -> FTP
-                    WebDAV.id -> WebDAV
-                    NFS.id -> NFS
+                return when {
+                    SMB.type.isType(id) -> SMB
+                    FTP.type.isType(id) -> FTP
+                    WebDAV.type.isType(id) -> WebDAV
+                    NFS.type.isType(id) -> NFS
                     else -> throw IllegalArgumentException("Unknown ZeroConf service type: $id")
                 }
             }
