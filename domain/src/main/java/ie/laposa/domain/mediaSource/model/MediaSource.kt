@@ -17,7 +17,8 @@ data class MediaSource(
                 type = MediaSourceType.ZeroConf.fromId(service.serviceType),
                 displayName = service.serviceName,
                 sourceName = when {
-                   ZeroConfServiceType.SMB.isType(service.serviceType) -> "SMB"
+                    ZeroConfServiceType.SMB.isType(service.serviceType) -> "SMB"
+                    ZeroConfServiceType.NFS.isType(service.serviceType) -> "NFS"
                     else -> service.serviceType
                 },
             )
@@ -26,7 +27,7 @@ data class MediaSource(
 }
 
 @Parcelize
-sealed class MediaSourceType(): Parcelable {
+sealed class MediaSourceType : Parcelable {
     @Parcelize
     sealed class ZeroConf(val type: ZeroConfServiceType) : MediaSourceType() {
         data object SMB : ZeroConf(ZeroConfServiceType.SMB)

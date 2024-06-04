@@ -4,6 +4,7 @@ import android.net.nsd.NsdServiceInfo
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.mediaSource.model.MediaSourceType
+import ie.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
 import ie.laposa.domain.mediaSource.model.samba.SambaMediaProvider
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import ie.laposa.domain.zeroConf.ZeroConfService
@@ -14,11 +15,13 @@ import kotlinx.coroutines.flow.collectLatest
 class MediaSourceService(
     private val zeroConf: ZeroConfService,
     private val sambaMediaProvider: SambaMediaProvider,
+    private val nfsMediaProvider: NfsMediaProvider,
 ) {
     private val _mediaSources = MutableStateFlow(emptyList<MediaSource>())
     val mediaSources: StateFlow<List<MediaSource>> = _mediaSources
 
-    private val _mediaProviders: List<MediaSourceProvider> = listOf(sambaMediaProvider)
+    private val _mediaProviders: List<MediaSourceProvider> =
+        listOf(sambaMediaProvider, nfsMediaProvider)
     private var _currentMediaProvider: MediaSourceProvider? = null
 
     val fileList: StateFlow<List<MediaSourceFile>?> = sambaMediaProvider.filesList
@@ -62,6 +65,10 @@ class MediaSourceService(
         return when (mediaSource.type) {
             is MediaSourceType.ZeroConf.SMB -> {
                 _mediaProviders.find { it is SambaMediaProvider }
+            }
+
+            is MediaSourceType.ZeroConf.NFS -> {
+                _mediaProviders.find { it is NfsMediaProvider }
             }
 
             else -> null

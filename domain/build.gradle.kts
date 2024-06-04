@@ -47,4 +47,6 @@ dependencies {
     kapt(libs.google.dagger.hilt.compiler)
     implementation(project(":bonsoir"))
     implementation(libs.dcerpc)
+    implementation(libs.nfsClient)
+    implementation(libs.vfs)
 }

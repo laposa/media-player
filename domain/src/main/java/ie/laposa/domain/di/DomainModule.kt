@@ -7,7 +7,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ie.laposa.domain.mediaSource.MediaSourceService
+import ie.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
 import ie.laposa.domain.mediaSource.model.samba.SambaMediaProvider
+import ie.laposa.domain.networkProtocols.nfs.NfsService
 import ie.laposa.domain.networkProtocols.smb.SmbService
 import ie.laposa.domain.zeroConf.ZeroConfService
 import javax.inject.Singleton
@@ -26,7 +28,13 @@ object DomainModule {
     fun provideSmbService(): SmbService {
         return SmbService()
     }
-    
+
+    @Singleton
+    @Provides
+    fun provideNfsService(): NfsService {
+        return NfsService()
+    }
+
     @Singleton
     @Provides
     fun provideSambaMediaProvider(smbService: SmbService): SambaMediaProvider {
@@ -35,10 +43,17 @@ object DomainModule {
 
     @Singleton
     @Provides
+    fun provideNfsMediaProvider(nfsService: NfsService): NfsMediaProvider {
+        return NfsMediaProvider(nfsService)
+    }
+
+    @Singleton
+    @Provides
     fun provideMediaSourceService(
         zeroConfService: ZeroConfService,
-        smMediaProvider: SambaMediaProvider
+        smMediaProvider: SambaMediaProvider,
+        nfsMediaProvider: NfsMediaProvider,
     ): MediaSourceService {
-        return MediaSourceService(zeroConfService, smMediaProvider)
+        return MediaSourceService(zeroConfService, smMediaProvider, nfsMediaProvider)
     }
 }

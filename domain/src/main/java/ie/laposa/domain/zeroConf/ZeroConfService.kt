@@ -20,7 +20,7 @@ enum class ZeroConfServiceType(val id: String, private val secondaryId: String? 
     SMB("_smb._tcp.", "._smb._tcp"),
     FTP("_ftp._tcp."),
     WEBDAV("_webdav._tcp."),
-    NFS("_nfs._tcp.");
+    NFS("_nfs._tcp.", "._nfs._tcp");
 
     fun isType(id: String): Boolean {
         return id.contains(this.id) || (secondaryId != null && id.contains(secondaryId))
@@ -28,7 +28,7 @@ enum class ZeroConfServiceType(val id: String, private val secondaryId: String? 
 }
 
 class ZeroConfService(context: Context) {
-    private val serviceTypes = listOf(ZeroConfServiceType.entries.map { it.id }.first())
+    private val serviceTypes = ZeroConfServiceType.entries.map { it.id }
 
     private val nsdManager: NsdManager = (context.getSystemService(NSD_SERVICE) as NsdManager)
     private val lock = Mutex()
