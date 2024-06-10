@@ -28,18 +28,22 @@ class SmbService {
 
     private var _currentShare: DiskShare? = null
 
-    fun connect(
+    suspend fun connect(
         serverName: String, userName: String? = null, password: String? = null, port: Int = 445
-    ) {
+    ) = withContext(Dispatchers.IO) {
+        println("Connecting to $userName, $password")
         try {
             val connection = client.connect(serverName, port)
-            val authContext = if (userName != null && password != null) {
-                AuthenticationContext(userName, password.toCharArray(), "")
-            } else {
-                AuthenticationContext.anonymous()
-            }
+            val authContext =
+                if (!userName.isNullOrEmpty() && !password.isNullOrEmpty()) {
+                    AuthenticationContext(userName, password.toCharArray(), "")
+                } else {
+                    AuthenticationContext.guest()
+                }
 
             _currentSession = connection.authenticate(authContext)
+
+            println("Connected to $serverName")
 
             val transport = SMBTransportFactories.SRVSVC.getTransport(_currentSession)
             val serverService = ServerService(transport)
@@ -51,10 +55,12 @@ class SmbService {
                     _currentShares.update {
                         (it ?: emptyList()) + share.netName
                     }
+                    _currentShares.value = _currentShares.value?.distinct()
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            throw WrongCredentialsException()
         }
     }
 
@@ -70,7 +76,7 @@ class SmbService {
                         _currentFilesList.update { filesList ->
                             (filesList
                                 ?: emptyList()).plus(list.map { MediaSourceFile(it.fileName) })
-                                .distinct()
+                                .distinctBy { it.fileName }
                         }
                     }
                 }

@@ -1,6 +1,5 @@
 package ie.laposa.domain.mediaSource
 
-import android.net.nsd.NsdServiceInfo
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.mediaSource.model.MediaSourceType
@@ -54,9 +53,11 @@ class MediaSourceService(
 
         when (mediaSource.type) {
             is MediaSourceType.ZeroConf -> {
-                zeroConf.resolveServiceById(mediaSource.type.type.id) { it: NsdServiceInfo ->
-                    onZeroConfServiceResolved(it, userName, password)
-                }
+                connectToZeroConfMediaSource(
+                    mediaSource.connectionAddress!!,
+                    userName,
+                    password,
+                )
             }
         }
     }
@@ -75,13 +76,13 @@ class MediaSourceService(
         }
     }
 
-    private suspend fun onZeroConfServiceResolved(
-        service: NsdServiceInfo,
+    private suspend fun connectToZeroConfMediaSource(
+        connectionAddress: String,
         userName: String? = null,
         password: String? = null
     ) {
         _currentMediaProvider?.connectToMediaSource(
-            service.host.hostAddress,
+            connectionAddress,
             userName,
             password
         )

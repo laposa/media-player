@@ -34,6 +34,9 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     private val _selectedSambaShare = MutableStateFlow<String?>(null)
     val selectedSambaShare: StateFlow<String?> = _selectedSambaShare
 
+    private val _loginDialogError = MutableStateFlow<String?>(null)
+    val loginDialogError: StateFlow<String?> = _loginDialogError
+
     fun fetchMediaSources() {
         launch(false) {
             mediaSourceService.fetchMediaSources()
@@ -41,16 +44,8 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     }
 
     fun onMediaSourceSelected(mediaSource: MediaSource) {
-        when (mediaSource.type) {
-            is MediaSourceType.ZeroConf.SMB -> {
-                _selectedMediaSource = mediaSource
-                _isLoginViewModelVisible.value = true
-            }
-
-            else -> {
-                connectToMediaSource(mediaSource)
-            }
-        }
+        _selectedMediaSource = mediaSource
+        showLoginDialog()
     }
 
     fun onSambaShareSelected(shareName: String) {
@@ -62,15 +57,32 @@ class MediaSourcesLibraryViewModel @Inject constructor(
         }
     }
 
-    fun onLoginSubmit(userName: String, password: String) {
-        _isLoginViewModelVisible.value = false
+    fun showLoginDialog() {
+        _loginDialogError.value = null
+        _isLoginViewModelVisible.value = true
+    }
 
-        when (_selectedMediaSource?.type) {
-            is MediaSourceType.ZeroConf.SMB -> {
-                connectToMediaSource(_selectedMediaSource!!, userName, password)
+    fun hideLoginDialog() {
+        _isLoginViewModelVisible.value = false
+    }
+
+    fun onLoginSubmit(userName: String?, password: String?) {
+        launch(handleError = false) {
+            try {
+                when (_selectedMediaSource?.type) {
+                    is MediaSourceType.ZeroConf.SMB -> {
+                        connectToMediaSource(_selectedMediaSource!!, userName, password)
+                    }
+
+                    else -> connectToMediaSource(_selectedMediaSource!!)
+                }
+            } catch (e: Exception) {
+                _loginDialogError.value = e.message
             }
 
-            else -> connectToMediaSource(_selectedMediaSource!!)
+            if (_loginDialogError.value == null) {
+                _isLoginViewModelVisible.value = false
+            }
         }
     }
 
@@ -81,22 +93,20 @@ class MediaSourcesLibraryViewModel @Inject constructor(
         }
     }
 
-    private fun connectToMediaSource(
+    private suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String? = null,
         password: String? = null
     ) {
-        launch {
-            when (mediaSource.type) {
-                is MediaSourceType.ZeroConf.SMB -> {
-                    mediaSourceService.connectToMediaSource(mediaSource, userName, password)
-                    _isSambaSharesListVisible.value = true
-                }
+        when (mediaSource.type) {
+            is MediaSourceType.ZeroConf.SMB -> {
+                mediaSourceService.connectToMediaSource(mediaSource, userName, password)
+                _isSambaSharesListVisible.value = true
+            }
 
-                else -> {
-                    mediaSourceService.connectToMediaSource(mediaSource)
-                    _isFilesLibraryVisible.value = true
-                }
+            else -> {
+                mediaSourceService.connectToMediaSource(mediaSource)
+                _isFilesLibraryVisible.value = true
             }
         }
     }

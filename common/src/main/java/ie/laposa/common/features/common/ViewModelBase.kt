@@ -9,11 +9,22 @@ abstract class ViewModelBase : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading
 
-    fun launch(handleLoading: Boolean = true, block: suspend () -> Unit) {
+    fun launch(
+        handleLoading: Boolean = true,
+        handleError: Boolean = true,
+        onError: (Throwable) -> Unit = {},
+        block: suspend () -> Unit
+    ) {
         viewModelScope.launch {
-            if (handleLoading) _isLoading.value = true
-            block()
-            if (handleLoading) _isLoading.value = false
+            try {
+                if (handleLoading) _isLoading.value = true
+                block()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                if (handleError) onError(e) else throw e
+            } finally {
+                if (handleLoading) _isLoading.value = false
+            }
         }
     }
 }

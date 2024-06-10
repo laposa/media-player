@@ -36,6 +36,10 @@ fun rememberVideoPlayerAppState(
 sealed interface Screen {
     val route: String
 
+    data object Home : Screen {
+        override val route = "/home"
+    }
+
     data object SampleMediaLib : Screen {
         override val route = "/sampleMediaLib"
     }

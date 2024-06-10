@@ -10,6 +10,7 @@ data class MediaSource(
     val type: MediaSourceType,
     val sourceName: String,
     val displayName: String,
+    val connectionAddress: String? = null,
 ) : Parcelable {
     companion object {
         fun fromNSD(service: NsdServiceInfo): MediaSource {
@@ -21,6 +22,7 @@ data class MediaSource(
                     ZeroConfServiceType.NFS.isType(service.serviceType) -> "NFS"
                     else -> service.serviceType
                 },
+                connectionAddress = service.host.hostAddress
             )
         }
     }

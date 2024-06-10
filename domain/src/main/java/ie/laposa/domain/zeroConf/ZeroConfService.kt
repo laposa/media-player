@@ -33,9 +33,10 @@ class ZeroConfService(context: Context) {
     private val nsdManager: NsdManager = (context.getSystemService(NSD_SERVICE) as NsdManager)
     private val lock = Mutex()
 
-    private val _discoveredServices: MutableStateFlow<List<NsdServiceInfo>> = MutableStateFlow(
-        emptyList()
-    )
+    private val _discoveredServices: MutableStateFlow<MutableList<NsdServiceInfo>> =
+        MutableStateFlow(
+            mutableListOf()
+        )
 
     val discoveredServices: StateFlow<List<NsdServiceInfo>> = _discoveredServices
     suspend fun startDiscovery() = coroutineScope {
@@ -52,26 +53,23 @@ class ZeroConfService(context: Context) {
 
     suspend fun resolveService(
         serviceInfo: NsdServiceInfo,
-        onResolved: suspend (NsdServiceInfo) -> Unit
-    ) =
-        coroutineScope {
-            nsdManager.resolveService(serviceInfo, createResolveListener(this, onResolved))
-            return@coroutineScope serviceInfo
+    ) {
+        return coroutineScope {
+            nsdManager.resolveService(serviceInfo, createResolveListener(this))
         }
+    }
 
     suspend fun resolveServiceById(
         serviceId: String,
-        onResolved: suspend (NsdServiceInfo) -> Unit
     ): NsdServiceInfo? {
-        return coroutineScope {
-            println("Resolving service by id: $serviceId")
-            val service = _discoveredServices.value.find { it.serviceType == serviceId }
-            if (service != null) {
-                resolveService(service, onResolved)
-            }
+        println("Resolving service by id: $serviceId")
+        val service = _discoveredServices.value.find { it.serviceType == serviceId }
 
-            return@coroutineScope service
+        if (service != null) {
+            resolveService(service)
         }
+
+        return service
     }
 
     private fun getDiscoveryListener(coroutineScope: CoroutineScope) =
@@ -89,9 +87,10 @@ class ZeroConfService(context: Context) {
 
                 coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     lock.withLock {
-                        _discoveredServices.emit((_discoveredServices.value + service).distinctBy {
+                        resolveService(service)
+                        /*_discoveredServices.emit((_discoveredServices.value + service).distinctBy {
                             it.serviceName
-                        })
+                        })*/
                     }
                 }
             }
@@ -124,7 +123,6 @@ class ZeroConfService(context: Context) {
 
     private fun createResolveListener(
         coroutineScope: CoroutineScope,
-        onResolved: suspend (NsdServiceInfo) -> Unit
     ) =
         object : NsdManager.ResolveListener {
             override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -135,16 +133,14 @@ class ZeroConfService(context: Context) {
                 coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     Log.i(TAG, "Resolve Succeeded. $serviceInfo")
                     lock.withLock {
-                        val services = _discoveredServices.value as MutableList
+                        val services = _discoveredServices.value
                         val index =
-                            services.indexOfFirst { it.serviceName == serviceInfo.serviceName }
+                            services.indexOfFirst { it.serviceName == serviceInfo.serviceName && it.host == serviceInfo.host && it.serviceType == serviceInfo.serviceType }
                         if (index != -1) {
                             services.removeAt(index)
                         }
-                        _discoveredServices.emit(services + serviceInfo)
 
-                        println("Resolved service: ${serviceInfo}")
-                        onResolved(serviceInfo)
+                        _discoveredServices.emit((services + serviceInfo).toMutableList())
                     }
                 }
             }

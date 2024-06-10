@@ -16,10 +16,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LaposaVideoPlayerTheme {
+            LaposaVideoPlayerTheme(isInDarkTheme = true) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    shape = RectangleShape
+                    shape = RectangleShape,
                 ) {
                     VideoPlayerApp()
                 }

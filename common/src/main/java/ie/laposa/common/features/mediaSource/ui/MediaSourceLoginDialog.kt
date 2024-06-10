@@ -1,11 +1,17 @@
 package ie.laposa.common.features.mediaSource.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -14,38 +20,76 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.tv.material3.MaterialTheme
+import ie.laposa.common.theme.surfaceDark
+import ie.laposa.common.ui.theme.ComponentsTheme
 
 
 @Composable
-fun MediaSourceLoginDialog(onSubmit: (String, String) -> Unit) {
-    var userName by remember { mutableStateOf("frenkybojler") }
-    var password by remember { mutableStateOf("F98zi6o6") }
+fun MediaSourceLoginDialog(
+    error: String?,
+    onDismiss: () -> Unit,
+    onSubmit: (String?, String?) -> Unit
+) {
+    var userName by remember { mutableStateOf<String?>(null) }
+    var password by remember { mutableStateOf<String?>(null) }
 
-    Dialog(onDismissRequest = { }) {
-        Card {
-            Box(modifier = Modifier.padding(16.dp)) {
+    fun onLoginSubmit() {
+        onSubmit(userName, password)
+    }
+
+    Dialog(onDismissRequest = {
+        onDismiss()
+    }) {
+        Card(
+            colors = CardDefaults.cardColors().copy(containerColor = surfaceDark),
+            modifier = Modifier.shadow(12.dp, RoundedCornerShape(8.dp))
+        ) {
+            Box(modifier = Modifier.padding(16.dp).background(Color.Transparent)) {
                 Column {
-                    Text("Login to media source")
-
-                    TextField(
-                        value = userName,
-                        onValueChange = { userName = it },
-                        label = { Text("User Name") }
+                    Text(
+                        "Login to media source",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelLarge
                     )
-
+                    Spacer(modifier = Modifier.height(16.dp))
                     TextField(
-                        value = password,
+                        value = userName ?: "",
+                        onValueChange = { userName = it },
+                        label = { Text("User Name") },
+                        shape = RoundedCornerShape(12.dp),
+                        isError = error != null,
+                        colors = ComponentsTheme.textInputColors()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = password ?: "",
                         onValueChange = { password = it },
                         label = { Text("Password") },
                         visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        shape = RoundedCornerShape(12.dp),
+                        isError = error != null,
+                        colors = ComponentsTheme.textInputColors()
                     )
-
-                    Button(onClick = { onSubmit(userName, password) }) {
+                    if (error != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(error, color = Color.Red)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { onLoginSubmit() },
+                        colors = ButtonDefaults.buttonColors().copy(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        )
+                    ) {
                         Text("Login")
                     }
                 }

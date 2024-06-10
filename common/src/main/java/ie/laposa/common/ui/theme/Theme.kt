@@ -2,26 +2,28 @@ package ie.laposa.common.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.darkColorScheme
-import androidx.tv.material3.lightColorScheme
-import ie.laposa.common.ui.colorSchemeForDarkMode
-import ie.laposa.common.ui.colorSchemeForLightMode
+import com.google.tv.material.catalog.colorutils.Scheme.Companion.dark
+import com.google.tv.material.catalog.colorutils.Scheme.Companion.light
+import com.google.tv.material.catalog.colorutils.toColorScheme
 
 @Composable
 fun LaposaVideoPlayerTheme(
     isInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
+    val GreenSeedColor = Color(0xFF386A20)
+
     val colorScheme = if (isInDarkTheme) {
-        colorSchemeForDarkMode
+        dark(GreenSeedColor.toArgb())
     } else {
-        colorSchemeForLightMode
+        light(GreenSeedColor.toArgb())
     }
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colorScheme.toColorScheme(),
         typography = Typography,
-        content = content
+        content = content,
     )
 }
