@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import ie.laposa.common.features.sampleMedia.ui.SampleMediaScreen
 
 @Composable
-fun Dashboard() {
+fun Dashboard(onNavigateToPlayer: () -> Unit) {
     Column {
-        SampleMediaScreen { }
+        SampleMediaScreen(navigateToPlayer = onNavigateToPlayer)
     }
 }

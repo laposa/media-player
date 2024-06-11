@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,11 +34,11 @@ fun PlayerScreen(viewModel: PlayerScreenViewModel = hiltViewModel()) {
     }
 
     Box(
-        modifier = Modifier.fillMaxHeight(0.66f).fillMaxWidth().background(surfaceDark),
+        modifier = Modifier.fillMaxSize().background(surfaceDark),
         contentAlignment = androidx.compose.ui.Alignment.Center
     ) {
         selectedMedia.value?.let {
-            PlayerView(url = it.url)
+            PlayerView(url = it.filePath)
         } ?: selectedInputStreamDataSourcePayload.value?.let {
             PlayerView(payload = it)
         } ?: run {

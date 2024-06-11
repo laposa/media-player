@@ -21,8 +21,10 @@ class SmbService {
     private var client: SMBClient = SMBClient()
     private var _currentSession: Session? = null
 
-    private val _currentFilesList = MutableStateFlow<List<MediaSourceFile>?>(null)
-    val filesList: StateFlow<List<MediaSourceFile>?> = _currentFilesList
+    private val _currentFilesList = MutableStateFlow<MutableMap<String, List<MediaSourceFile>>>(
+        mutableMapOf()
+    )
+    val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = _currentFilesList
 
     private val _currentShares = MutableStateFlow<MutableMap<MediaSource, List<String>>>(
         mutableMapOf()
@@ -63,11 +65,12 @@ class SmbService {
                         val currentMediaSourceShares = it[mediaSource] ?: emptyList()
                         it[mediaSource] =
                             (currentMediaSourceShares + share.netName).distinct()
-                        println("Shares: $it")
                         it
                     }
                 }
             }
+
+            return@withContext true
         } catch (e: Exception) {
             e.printStackTrace()
             throw WrongCredentialsException()
@@ -81,12 +84,16 @@ class SmbService {
                 _currentShare = (it.connectShare(shareName) as DiskShare)
                 _currentShare?.let { share ->
                     _currentShare = share
+                    share.list("/").forEach {
+                        println("AHOJ: ${it.fileName}")
+                    }
                     for (fileExtension in videoFilesExtensions) {
                         val list = share.list("/", "*$fileExtension")
-                        _currentFilesList.update { filesList ->
-                            (filesList
-                                ?: emptyList()).plus(list.map { MediaSourceFile(it.fileName) })
+                        _currentFilesList.update { filesMap ->
+                            val currentShareFilesList = filesMap[shareName] ?: emptyList()
+                            filesMap[shareName] = currentShareFilesList.plus(list.map { MediaSourceFile(it.fileName) })
                                 .distinctBy { it.fileName }
+                            filesMap
                         }
                     }
                 }

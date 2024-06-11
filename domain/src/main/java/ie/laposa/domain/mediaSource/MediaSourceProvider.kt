@@ -4,14 +4,15 @@ import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 abstract class MediaSourceProvider {
-    abstract val filesList: Flow<List<MediaSourceFile>?>
+    abstract val filesList: StateFlow<Map<String, List<MediaSourceFile>>>
     abstract suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String? = null,
         password: String? = null
-    )
+    ): Boolean
 
     abstract suspend fun getFile(
         fileName: String

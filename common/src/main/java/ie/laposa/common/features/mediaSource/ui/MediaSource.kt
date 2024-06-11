@@ -2,6 +2,7 @@ package ie.laposa.common.features.mediaSource.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,8 +15,6 @@ import ie.laposa.domain.mediaSource.model.MediaSource as MediaSourceModel
 fun MediaSource(
     mediaSource: MediaSourceModel,
     onClick: (mediaSource: MediaSourceModel) -> Unit,
-    sharesList: List<String> = emptyList(),
-    onShareClick: (share: String) -> Unit,
     isLoading: Boolean = false
 ) {
     fun getIcon(mediaSource: MediaSourceModel): Int {
@@ -35,16 +34,16 @@ fun MediaSource(
             isLoading = isLoading,
             onClick = { onClick(mediaSource) },
         )
-        Column(modifier = Modifier.padding(start = 16.dp)) {
+        /*Column(modifier = Modifier.padding(start = 16.dp)) {
             for (share in sharesList) {
                 SectionItem(
                     title = share,
-                    iconResource = R.drawable.smb_share,
+                    iconResource = R.drawable.ic_folder,
                     isLoading = isLoading,
                     onClick = { onShareClick(share) },
                 )
             }
-        }
+        }*/
     }
 
 }

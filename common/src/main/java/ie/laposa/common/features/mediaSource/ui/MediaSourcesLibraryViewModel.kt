@@ -26,15 +26,12 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     private val _isFilesLibraryVisible = MutableStateFlow(false)
     val isFilesLibraryVisible: StateFlow<Boolean> = _isFilesLibraryVisible
 
-    private var _selectedMediaSource: MediaSource? = null
+    private var _selectedMediaSource: MutableStateFlow<MediaSource?> = MutableStateFlow(null)
+    val selectedMediaSource: StateFlow<MediaSource?> = _selectedMediaSource
 
-    val files: StateFlow<List<MediaSourceFile>?> = mediaSourceService.fileList
+    val files: StateFlow<Map<String, List<MediaSourceFile>>> = mediaSourceService.fileList
     val sambaShares: StateFlow<Map<MediaSource, List<String>>?> =
         mediaSourceService.sambaShares
-
-    val sambaSharesForSelectedMediaSource: Flow<List<String>?> = sambaShares.map {
-        it?.get(_selectedMediaSource)
-    }
 
     private val _selectedSambaShare = MutableStateFlow<String?>(null)
     val selectedSambaShare: StateFlow<String?> = _selectedSambaShare
@@ -49,17 +46,14 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     }
 
     fun onMediaSourceSelected(mediaSource: MediaSource) {
-        _selectedMediaSource = mediaSource
+        _selectedMediaSource.value = mediaSource
         showLoginDialog()
     }
 
-    fun onSambaShareSelected(shareName: String, onSuccess: () -> Unit) {
-        launch {
-            mediaSourceService.openShare(shareName)
-            _selectedSambaShare.value = shareName
-            _isFilesLibraryVisible.value = true
-            onSuccess()
-        }
+    suspend fun onSambaShareSelected(shareName: String) {
+        mediaSourceService.openShare(shareName)
+        _selectedSambaShare.value = shareName
+        _isFilesLibraryVisible.value = true
     }
 
     private fun showLoginDialog() {
@@ -76,12 +70,12 @@ class MediaSourcesLibraryViewModel @Inject constructor(
 
         launch(handleError = false) {
             try {
-                when (_selectedMediaSource?.type) {
+                when (_selectedMediaSource.value?.type) {
                     is MediaSourceType.ZeroConf.SMB -> {
-                        connectToMediaSource(_selectedMediaSource!!, userName, password)
+                        connectToMediaSource(_selectedMediaSource.value!!, userName, password)
                     }
 
-                    else -> connectToMediaSource(_selectedMediaSource!!)
+                    else -> connectToMediaSource(_selectedMediaSource.value!!)
                 }
             } catch (e: Exception) {
                 _loginDialogError.value = e.message
@@ -94,7 +88,6 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     }
 
     suspend fun onFileSelected(sourceFile: MediaSourceFile) {
-        _isFilesLibraryVisible.value = false
         mediaSourceService.getFile(sourceFile.fileName)?.let {
             savedStateHandleViewModel.setSelectedInputStreamDataSourceFileName(sourceFile.fileName)
         }
@@ -111,8 +104,8 @@ class MediaSourcesLibraryViewModel @Inject constructor(
             }
 
             else -> {
-                mediaSourceService.connectToMediaSource(mediaSource)
                 _isFilesLibraryVisible.value = true
+                mediaSourceService.connectToMediaSource(mediaSource)
             }
         }
     }

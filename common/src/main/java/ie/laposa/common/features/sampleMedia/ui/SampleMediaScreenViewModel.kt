@@ -13,23 +13,23 @@ class SampleMediaScreenViewModel @Inject constructor(
 ) : ViewModel() {
     private val _media = mutableStateListOf(
         Media(
-            title = "Big Buck Bunny",
-            url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            fileName = "Big Buck Bunny",
+            filePath = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
             thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
         ),
         Media(
-            title = "Elephant Dream",
-            url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            fileName = "Elephant Dream",
+            filePath = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
             thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg"
         ),
         Media(
-            title = "For Bigger Blazes For Bigger Blazes For Bigger Blazes For Bigger Blazes",
-            url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            fileName = "For Bigger Blazes For Bigger Blazes For Bigger Blazes For Bigger Blazes",
+            filePath = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
             thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg"
         ),
         Media(
-            title = "For Bigger Escape",
-            url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+            fileName = "For Bigger Escape",
+            filePath = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
             thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg"
         ),
     )

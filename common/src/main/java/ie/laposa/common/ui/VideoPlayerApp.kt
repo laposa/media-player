@@ -28,7 +28,7 @@ private fun Route(appState: VideoPlayerAppState) {
         navController = appState.navHostController,
         startDestination = Screen.Home.route
     ) {
-        composable(Screen.Home.route) { GlobalNavigationContainer(appState = appState) { Home() } }
+        composable(Screen.Home.route) { GlobalNavigationContainer(appState = appState) { Home(                 navigateToPlayer = appState::navigateToPlayer) } }
         composable(Screen.Player.route) { GlobalNavigationContainer(appState = appState) { PlayerScreen() } }
         composable(Screen.SampleMediaLib.route) {
             GlobalNavigationContainer(appState = appState) {

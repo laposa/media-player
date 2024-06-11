@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.StateFlow
 class SambaMediaProvider(
     private val smbService: SmbService,
 ) : MediaSourceProvider() {
-    override val filesList: StateFlow<List<MediaSourceFile>?> = smbService.filesList
+    override val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = smbService.filesList
     val shares: StateFlow<Map<MediaSource, List<String>>?> = smbService.shares
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String?,
         password: String?
-    ) {
-        smbService.connect(mediaSource, userName, password)
+    ) : Boolean {
+       return smbService.connect(mediaSource, userName, password)
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {

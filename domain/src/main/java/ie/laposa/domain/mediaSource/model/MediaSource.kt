@@ -11,6 +11,7 @@ data class MediaSource(
     val sourceName: String,
     val displayName: String,
     val connectionAddress: String? = null,
+    val isConnected: Boolean = false,
 ) : Parcelable {
     companion object {
         fun fromNSD(service: NsdServiceInfo): MediaSource {

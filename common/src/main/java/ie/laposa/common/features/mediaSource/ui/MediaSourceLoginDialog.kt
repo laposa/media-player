@@ -37,8 +37,8 @@ fun MediaSourceLoginDialog(
     onDismiss: () -> Unit,
     onSubmit: (String?, String?) -> Unit
 ) {
-    var userName by remember { mutableStateOf<String?>(null) }
-    var password by remember { mutableStateOf<String?>(null) }
+    var userName by remember { mutableStateOf<String?>("frenkybojler") }
+    var password by remember { mutableStateOf<String?>("F98zi6o6") }
 
     fun onLoginSubmit() {
         onSubmit(userName, password)

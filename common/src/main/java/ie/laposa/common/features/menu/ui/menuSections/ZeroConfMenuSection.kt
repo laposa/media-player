@@ -4,8 +4,11 @@ import androidx.compose.runtime.Composable
 import ie.laposa.common.features.mediaSource.ui.MediaSourcesLibrary
 
 @Composable
-fun ZeroConfMenuSection(setHomeContent: (@Composable () -> Unit) -> Unit) {
+fun ZeroConfMenuSection(
+    setHomeContent: (@Composable () -> Unit) -> Unit,
+    navigateToPlayer: () -> Unit
+) {
     MenuSection("Network") {
-        MediaSourcesLibrary(setHomeContent = setHomeContent)
+        MediaSourcesLibrary(setHomeContent = setHomeContent, navigateToPlayer = navigateToPlayer)
     }
 }

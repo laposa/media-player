@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import ie.laposa.common.features.home.ui.content.Dashboard
 
 @Composable
-fun HomeMenuSection(setHomeContent: (@Composable () -> Unit) -> Unit) {
+fun HomeMenuSection(setHomeContent: (@Composable () -> Unit) -> Unit, onNavigateToPlayer: () -> Unit) {
     MenuSection("Home") {
         SectionItem(
             "Dashboard",
@@ -14,7 +14,7 @@ fun HomeMenuSection(setHomeContent: (@Composable () -> Unit) -> Unit) {
             focusedByDefault = true,
         ) {
             setHomeContent {
-                Dashboard()
+                Dashboard(onNavigateToPlayer)
             }
         }
     }

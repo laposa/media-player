@@ -1,5 +1,6 @@
 package ie.laposa.domain.mediaSource
 
+import android.text.BoringLayout
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.mediaSource.model.MediaSourceType
@@ -23,7 +24,7 @@ class MediaSourceService(
         listOf(sambaMediaProvider, nfsMediaProvider)
     private var _currentMediaProvider: MediaSourceProvider? = null
 
-    val fileList: StateFlow<List<MediaSourceFile>?> = sambaMediaProvider.filesList
+    val fileList: StateFlow<Map<String, List<MediaSourceFile>>> = sambaMediaProvider.filesList
     val sambaShares: StateFlow<Map<MediaSource, List<String>>?> = sambaMediaProvider.shares
 
     suspend fun openShare(shareName: String) {
@@ -81,10 +82,24 @@ class MediaSourceService(
         userName: String? = null,
         password: String? = null
     ) {
-        _currentMediaProvider?.connectToMediaSource(
+        val result = _currentMediaProvider?.connectToMediaSource(
             mediaSource,
             userName,
             password
-        )
+        ) == true
+
+        if(result) {
+            markMediaSourceAsConnected(mediaSource)
+        }
+    }
+
+    private fun markMediaSourceAsConnected(mediaSource: MediaSource) {
+        _mediaSources.value = _mediaSources.value.map {
+            if(it == mediaSource) {
+                it.copy(isConnected = true)
+            } else {
+                it
+            }
+        }
     }
 }
