@@ -1,6 +1,7 @@
 package ie.laposa.domain.mediaSource.model.nfs
 
 import ie.laposa.domain.mediaSource.MediaSourceProvider
+import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.networkProtocols.nfs.NfsService
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
@@ -13,11 +14,11 @@ class NfsMediaProvider(
     override val filesList: Flow<List<MediaSourceFile>?> = flow {}
 
     override suspend fun connectToMediaSource(
-        serverName: String,
+        mediaSource: MediaSource,
         userName: String?,
         password: String?
     ) {
-        nfsService.connect(serverName)
+        nfsService.connect(mediaSource)
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {

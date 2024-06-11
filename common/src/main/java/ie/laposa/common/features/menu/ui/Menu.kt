@@ -9,16 +9,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ie.laposa.common.features.menu.ui.menuSections.HomeMenuSection
+import ie.laposa.common.features.menu.ui.menuSections.ZeroConfMenuSection
 
 @Composable
-fun Menu() {
+fun Menu(setHomeContent: (@Composable () -> Unit) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth(0.25f)) {
         Box(modifier = Modifier.padding(start = 16.dp)) {
             Header()
         }
         Spacer(modifier = Modifier.height(32.dp))
         Column {
-            ZeroConfMenuSection()
+            HomeMenuSection(setHomeContent)
+            Spacer(modifier = Modifier.height(16.dp))
+            ZeroConfMenuSection(setHomeContent)
         }
     }
 }
+

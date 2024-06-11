@@ -9,6 +9,7 @@ import com.hierynomus.smbj.session.Session
 import com.hierynomus.smbj.share.DiskShare
 import com.rapid7.client.dcerpc.mssrvs.ServerService
 import com.rapid7.client.dcerpc.transport.SMBTransportFactories
+import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,17 +24,23 @@ class SmbService {
     private val _currentFilesList = MutableStateFlow<List<MediaSourceFile>?>(null)
     val filesList: StateFlow<List<MediaSourceFile>?> = _currentFilesList
 
-    private val _currentShares = MutableStateFlow<List<String>?>(null)
-    val shares: StateFlow<List<String>?> = _currentShares
+    private val _currentShares = MutableStateFlow<MutableMap<MediaSource, List<String>>>(
+        mutableMapOf()
+    )
+
+    val shares: StateFlow<Map<MediaSource, List<String>>> = _currentShares
 
     private var _currentShare: DiskShare? = null
 
     suspend fun connect(
-        serverName: String, userName: String? = null, password: String? = null, port: Int = 445
+        mediaSource: MediaSource,
+        userName: String? = null,
+        password: String? = null,
+        port: Int = 445,
     ) = withContext(Dispatchers.IO) {
         println("Connecting to $userName, $password")
         try {
-            val connection = client.connect(serverName, port)
+            val connection = client.connect(mediaSource.connectionAddress, port)
             val authContext =
                 if (!userName.isNullOrEmpty() && !password.isNullOrEmpty()) {
                     AuthenticationContext(userName, password.toCharArray(), "")
@@ -43,7 +50,7 @@ class SmbService {
 
             _currentSession = connection.authenticate(authContext)
 
-            println("Connected to $serverName")
+            println("Connected to ${mediaSource.connectionAddress}")
 
             val transport = SMBTransportFactories.SRVSVC.getTransport(_currentSession)
             val serverService = ServerService(transport)
@@ -53,9 +60,12 @@ class SmbService {
             for (share in shares) {
                 if (!share.netName.contains("$")) {
                     _currentShares.update {
-                        (it ?: emptyList()) + share.netName
+                        val currentMediaSourceShares = it[mediaSource] ?: emptyList()
+                        it[mediaSource] =
+                            (currentMediaSourceShares + share.netName).distinct()
+                        println("Shares: $it")
+                        it
                     }
-                    _currentShares.value = _currentShares.value?.distinct()
                 }
             }
         } catch (e: Exception) {

@@ -24,7 +24,7 @@ class MediaSourceService(
     private var _currentMediaProvider: MediaSourceProvider? = null
 
     val fileList: StateFlow<List<MediaSourceFile>?> = sambaMediaProvider.filesList
-    val sambaShares: StateFlow<List<String>?> = sambaMediaProvider.shares
+    val sambaShares: StateFlow<Map<MediaSource, List<String>>?> = sambaMediaProvider.shares
 
     suspend fun openShare(shareName: String) {
         sambaMediaProvider.openShare(shareName)
@@ -54,7 +54,7 @@ class MediaSourceService(
         when (mediaSource.type) {
             is MediaSourceType.ZeroConf -> {
                 connectToZeroConfMediaSource(
-                    mediaSource.connectionAddress!!,
+                    mediaSource,
                     userName,
                     password,
                 )
@@ -77,12 +77,12 @@ class MediaSourceService(
     }
 
     private suspend fun connectToZeroConfMediaSource(
-        connectionAddress: String,
+        mediaSource: MediaSource,
         userName: String? = null,
         password: String? = null
     ) {
         _currentMediaProvider?.connectToMediaSource(
-            connectionAddress,
+            mediaSource,
             userName,
             password
         )

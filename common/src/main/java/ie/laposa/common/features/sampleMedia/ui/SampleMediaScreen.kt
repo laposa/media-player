@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.common.features.mediaLib.ui.MediaLibrary
-import ie.laposa.common.features.mediaSource.ui.MediaSourcesLibrary
 
 @Composable
 fun SampleMediaScreen(
@@ -18,7 +17,6 @@ fun SampleMediaScreen(
     }
 
     Column {
-        MediaLibrary(viewModel.media, ::onMediaSelected)
-        MediaSourcesLibrary(navigateToPlayer = navigateToPlayer)
+        MediaLibrary("Samples", viewModel.media, ::onMediaSelected)
     }
 }

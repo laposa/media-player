@@ -1,5 +1,6 @@
 package ie.laposa.domain.networkProtocols.nfs
 
+import ie.laposa.domain.mediaSource.model.MediaSource
 import org.apache.commons.vfs2.FileObject
 import org.apache.commons.vfs2.VFS
 import java.net.URI
@@ -7,13 +8,14 @@ import java.net.URI
 
 class NfsService {
     fun connect(
-        serverName: String
+        mediaSource: MediaSource,
     ) {
         val fsManager = VFS.getManager()
 
 
         // Construct the NFS URL
-        val nfsUrl = URI.create("$serverName/Users/tomaspolak/Movies/GoPro/test.MP4")
+        val nfsUrl =
+            URI.create("${mediaSource.connectionAddress}/Users/tomaspolak/Movies/GoPro/test.MP4")
 
 
         // Resolve the file object

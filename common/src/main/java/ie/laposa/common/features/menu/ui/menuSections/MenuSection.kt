@@ -1,4 +1,4 @@
-package ie.laposa.common.features.menu.ui
+package ie.laposa.common.features.menu.ui.menuSections
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +13,11 @@ import ie.laposa.common.theme.VideoPlayerTypography
 
 @Composable
 fun MenuSection(
-    title: String, content: @Composable () -> Unit
+    title: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
-    Column {
+    Column(modifier = modifier) {
         Row(Modifier.padding(start = 16.dp)) {
             Text(title, style = VideoPlayerTypography.titleSmall)
         }

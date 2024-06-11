@@ -1,6 +1,7 @@
 package ie.laposa.domain.mediaSource.model.samba
 
 import ie.laposa.domain.mediaSource.MediaSourceProvider
+import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import ie.laposa.domain.networkProtocols.smb.SmbService
@@ -10,13 +11,13 @@ class SambaMediaProvider(
     private val smbService: SmbService,
 ) : MediaSourceProvider() {
     override val filesList: StateFlow<List<MediaSourceFile>?> = smbService.filesList
-    val shares: StateFlow<List<String>?> = smbService.shares
+    val shares: StateFlow<Map<MediaSource, List<String>>?> = smbService.shares
     override suspend fun connectToMediaSource(
-        serverName: String,
+        mediaSource: MediaSource,
         userName: String?,
         password: String?
     ) {
-        smbService.connect(serverName, userName, password)
+        smbService.connect(mediaSource, userName, password)
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {

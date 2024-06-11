@@ -7,8 +7,10 @@ import ie.laposa.domain.mediaSource.MediaSourceService
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.mediaSource.model.MediaSourceType
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,13 +26,16 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     private val _isFilesLibraryVisible = MutableStateFlow(false)
     val isFilesLibraryVisible: StateFlow<Boolean> = _isFilesLibraryVisible
 
-    private val _isSambaSharesListVisible = MutableStateFlow(false)
-    val isSambaSharesListVisible: StateFlow<Boolean> = _isSambaSharesListVisible
-
     private var _selectedMediaSource: MediaSource? = null
 
     val files: StateFlow<List<MediaSourceFile>?> = mediaSourceService.fileList
-    val sambaShares: StateFlow<List<String>?> = mediaSourceService.sambaShares
+    val sambaShares: StateFlow<Map<MediaSource, List<String>>?> =
+        mediaSourceService.sambaShares
+
+    val sambaSharesForSelectedMediaSource: Flow<List<String>?> = sambaShares.map {
+        it?.get(_selectedMediaSource)
+    }
+
     private val _selectedSambaShare = MutableStateFlow<String?>(null)
     val selectedSambaShare: StateFlow<String?> = _selectedSambaShare
 
@@ -48,16 +53,16 @@ class MediaSourcesLibraryViewModel @Inject constructor(
         showLoginDialog()
     }
 
-    fun onSambaShareSelected(shareName: String) {
+    fun onSambaShareSelected(shareName: String, onSuccess: () -> Unit) {
         launch {
             mediaSourceService.openShare(shareName)
             _selectedSambaShare.value = shareName
-            _isSambaSharesListVisible.value = false
             _isFilesLibraryVisible.value = true
+            onSuccess()
         }
     }
 
-    fun showLoginDialog() {
+    private fun showLoginDialog() {
         _loginDialogError.value = null
         _isLoginViewModelVisible.value = true
     }
@@ -67,6 +72,8 @@ class MediaSourcesLibraryViewModel @Inject constructor(
     }
 
     fun onLoginSubmit(userName: String?, password: String?) {
+        _loginDialogError.value = null
+
         launch(handleError = false) {
             try {
                 when (_selectedMediaSource?.type) {
@@ -101,7 +108,6 @@ class MediaSourcesLibraryViewModel @Inject constructor(
         when (mediaSource.type) {
             is MediaSourceType.ZeroConf.SMB -> {
                 mediaSourceService.connectToMediaSource(mediaSource, userName, password)
-                _isSambaSharesListVisible.value = true
             }
 
             else -> {

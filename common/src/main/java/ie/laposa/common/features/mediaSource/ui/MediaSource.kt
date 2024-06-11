@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ie.laposa.common.R
-import ie.laposa.common.features.menu.ui.SectionItem
+import ie.laposa.common.features.menu.ui.menuSections.SectionItem
 import ie.laposa.domain.mediaSource.model.MediaSourceType
 import ie.laposa.domain.mediaSource.model.MediaSource as MediaSourceModel
 
@@ -30,17 +30,18 @@ fun MediaSource(
     Column {
         SectionItem(
             title = mediaSource.displayName,
-            icon = getIcon(mediaSource),
-            onClick = { onClick(mediaSource) },
+            subTitle = mediaSource.type.toString(),
+            iconResource = getIcon(mediaSource),
             isLoading = isLoading,
+            onClick = { onClick(mediaSource) },
         )
         Column(modifier = Modifier.padding(start = 16.dp)) {
             for (share in sharesList) {
                 SectionItem(
                     title = share,
-                    icon = R.drawable.smb_share,
-                    onClick = { onShareClick(share) },
+                    iconResource = R.drawable.smb_share,
                     isLoading = isLoading,
+                    onClick = { onShareClick(share) },
                 )
             }
         }
