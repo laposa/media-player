@@ -38,16 +38,16 @@ fun SectionItem(
     iconResource: Int? = null,
     icon: ImageVector? = null,
     isLoading: Boolean = false,
-    focusedByDefault: Boolean = false,
+    isSelected: Boolean = false,
     onClick: () -> Unit
 ) {
-    var isFocused by remember { mutableStateOf(focusedByDefault) }
+    var isFocused by remember { mutableStateOf(isSelected) }
     val focusRequester = remember { FocusRequester() }
 
     var focusedFromInside by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (focusedByDefault) {
+        if (isSelected) {
             focusRequester.requestFocus()
         }
     }
@@ -59,7 +59,6 @@ fun SectionItem(
             .height(42.dp)
             .onFocusEvent {
                 isFocused = it.hasFocus
-                println("$title onFocusEvent ${it.hasFocus} - focusedFromInside: $focusedFromInside")
                 if (it.hasFocus && !focusedFromInside) {
                     focusedFromInside = true
                     onClick()
@@ -69,8 +68,9 @@ fun SectionItem(
             }
             .focusable()
             .focusRequester(focusRequester)
-            .clickable { onClick() }.fillMaxWidth(),
-        color = if (isFocused) Color.White else Color.Transparent
+            .clickable { onClick() }
+            .fillMaxWidth(),
+        color = if (isSelected) Color.White else Color.Transparent
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -81,15 +81,19 @@ fun SectionItem(
                     IconCompose(
                         painter = painterResource(iconResource),
                         contentDescription = title,
-                        modifier = Modifier.width(14.dp).height(14.dp),
-                        tint = if (isFocused) Color.Black else Color.White,
+                        modifier = Modifier
+                            .width(14.dp)
+                            .height(14.dp),
+                        tint = if (isSelected) Color.Black else Color.White,
                     )
                 } else if (icon != null) {
                     IconCompose(
                         icon,
                         contentDescription = title,
-                        modifier = Modifier.width(14.dp).height(14.dp),
-                        tint = if (isFocused) Color.Black else Color.White,
+                        modifier = Modifier
+                            .width(14.dp)
+                            .height(14.dp),
+                        tint = if (isSelected) Color.Black else Color.White,
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
@@ -98,7 +102,7 @@ fun SectionItem(
                         subTitle,
                         modifier = Modifier.width(30.dp),
                         style = VideoPlayerTypography.bodySmall.copy(
-                            color = if (isFocused) Color.Black else Color.White
+                            color = if (isSelected) Color.Black else Color.White
                         ),
                     )
                 }
@@ -107,13 +111,13 @@ fun SectionItem(
             Text(
                 title,
                 style = VideoPlayerTypography.labelMedium.copy(
-                    color = if (isFocused) Color.Black else Color.White
+                    color = if (isSelected) Color.Black else Color.White
                 ),
             )
             Spacer(modifier = Modifier.weight(1f))
             if (isLoading) CircularProgressIndicator(
                 modifier = Modifier.size(14.dp),
-                color = if (isFocused) Color.Black else Color.White,
+                color = if (isSelected) Color.Black else Color.White,
                 strokeWidth = 2.dp
             )
         }

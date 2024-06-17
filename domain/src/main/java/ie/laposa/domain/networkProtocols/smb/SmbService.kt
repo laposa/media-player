@@ -1,8 +1,10 @@
 package ie.laposa.domain.networkProtocols.smb
 
 import com.hierynomus.msdtyp.AccessMask
+import com.hierynomus.msfscc.FileAttributes
 import com.hierynomus.mssmb2.SMB2CreateDisposition
 import com.hierynomus.mssmb2.SMB2ShareAccess
+import com.hierynomus.protocol.commons.EnumWithValue.EnumUtils
 import com.hierynomus.smbj.SMBClient
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.session.Session
@@ -10,7 +12,10 @@ import com.hierynomus.smbj.share.DiskShare
 import com.rapid7.client.dcerpc.mssrvs.ServerService
 import com.rapid7.client.dcerpc.transport.SMBTransportFactories
 import ie.laposa.domain.mediaSource.model.MediaSource
+import ie.laposa.domain.mediaSource.model.MediaSourceDirectory
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
+import ie.laposa.domain.mediaSource.model.MediaSourceFileBase
+import ie.laposa.domain.mediaSource.model.MediaSourceShare
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +31,7 @@ class SmbService {
     )
     val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = _currentFilesList
 
+    private var _currentMediaSource: MediaSource? = null
     private val _currentShares = MutableStateFlow<MutableMap<MediaSource, List<String>>>(
         mutableMapOf()
     )
@@ -40,6 +46,7 @@ class SmbService {
         password: String? = null,
         port: Int = 445,
     ) = withContext(Dispatchers.IO) {
+        _currentMediaSource = mediaSource
         println("Connecting to $userName, $password")
         try {
             val connection = client.connect(mediaSource.connectionAddress, port)
@@ -77,27 +84,74 @@ class SmbService {
         }
     }
 
-    suspend fun openShare(shareName: String) {
+    suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> =
         withContext(Dispatchers.IO) {
-            _currentShare?.close()
-            _currentSession?.let {
-                _currentShare = (it.connectShare(shareName) as DiskShare)
-                _currentShare?.let { share ->
-                    _currentShare = share
-                    share.list("/").forEach {
-                        println("AHOJ: ${it.fileName}")
+            if (path == "" && _currentShare == null) {
+                return@withContext _currentMediaSource?.let {
+                    _currentShares.value[it]?.map {
+                        MediaSourceShare(it)
                     }
-                    for (fileExtension in videoFilesExtensions) {
-                        val list = share.list("/", "*$fileExtension")
-                        _currentFilesList.update { filesMap ->
-                            val currentShareFilesList = filesMap[shareName] ?: emptyList()
-                            filesMap[shareName] = currentShareFilesList.plus(list.map { MediaSourceFile(it.fileName) })
-                                .distinctBy { it.fileName }
-                            filesMap
+                } ?: emptyList()
+            }
+
+            return@withContext _currentShare?.let { share ->
+                share.list(path).mapNotNull { item ->
+                    if (EnumUtils.isSet(
+                            item.fileAttributes,
+                            FileAttributes.FILE_ATTRIBUTE_DIRECTORY
+                        ) && item.fileName != "." && item.fileName != ".."
+                    ) {
+                        MediaSourceDirectory(
+                            item.fileName,
+                            path,
+                        )
+                    } else {
+                        if (videoFilesExtensions.any {
+                                item.fileName.contains(it)
+                            }) {
+                            MediaSourceFile(
+                                item.fileName,
+                                path,
+                            )
+                        } else {
+                            null
                         }
                     }
                 }
+            } ?: emptyList()
+        }
+
+    suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
+        return withContext(Dispatchers.IO) {
+            if (_currentShare == null || _currentShare?.smbPath?.shareName != shareName) {
+                _currentShare?.close()
+                _currentShare = (_currentSession?.connectShare(shareName) as DiskShare)
             }
+            /*  _currentSession?.let {
+                if (_currentShare?.smbPath?.shareName != shareName || _currentShare == null) {
+                     _currentShare?.close()
+                     _currentShare = (it.connectShare(shareName) as DiskShare)
+                 }
+
+                 _currentShare?.let { share ->
+                     for (fileExtension in videoFilesExtensions) {
+                         val list = share.list("/", "*$fileExtension")
+                         _currentFilesList.update { filesMap ->
+                             val currentShareFilesList = filesMap[shareName] ?: emptyList()
+                             //TODO: Wrong
+                             filesMap[shareName] = currentShareFilesList.plus(list.map {
+                                 MediaSourceFile(
+                                     it.fileName,
+                                     it.fileName
+                                 )
+                             })
+                                 .distinctBy { it.fileName }
+                             filesMap
+                         }
+                     }
+                 }
+             }*/
+            return@withContext getContentOfDirectoryAtPath("/")
         }
     }
 

@@ -3,6 +3,7 @@ package ie.laposa.domain.mediaSource.model.samba
 import ie.laposa.domain.mediaSource.MediaSourceProvider
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
+import ie.laposa.domain.mediaSource.model.MediaSourceFileBase
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import ie.laposa.domain.networkProtocols.smb.SmbService
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,11 @@ class SambaMediaProvider(
         return file
     }
 
-    suspend fun openShare(shareName: String) {
-        smbService.openShare(shareName)
+    override suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
+        return smbService.openShare(shareName)
+    }
+
+    override suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> {
+        return smbService.getContentOfDirectoryAtPath(path)
     }
 }

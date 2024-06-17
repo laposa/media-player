@@ -15,7 +15,8 @@ import ie.laposa.domain.mediaSource.model.MediaSource as MediaSourceModel
 fun MediaSource(
     mediaSource: MediaSourceModel,
     onClick: (mediaSource: MediaSourceModel) -> Unit,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    isSelected: Boolean = false,
 ) {
     fun getIcon(mediaSource: MediaSourceModel): Int {
         return when (mediaSource.type) {
@@ -33,17 +34,7 @@ fun MediaSource(
             iconResource = getIcon(mediaSource),
             isLoading = isLoading,
             onClick = { onClick(mediaSource) },
+            isSelected = isSelected,
         )
-        /*Column(modifier = Modifier.padding(start = 16.dp)) {
-            for (share in sharesList) {
-                SectionItem(
-                    title = share,
-                    iconResource = R.drawable.ic_folder,
-                    isLoading = isLoading,
-                    onClick = { onShareClick(share) },
-                )
-            }
-        }*/
     }
-
 }

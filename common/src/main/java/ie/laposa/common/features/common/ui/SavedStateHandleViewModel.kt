@@ -5,8 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
+import javax.inject.Inject
 
-class SavedStateHandleViewModel(
+class SavedStateHandleViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     fun setSelectedMedia(media: Media) {

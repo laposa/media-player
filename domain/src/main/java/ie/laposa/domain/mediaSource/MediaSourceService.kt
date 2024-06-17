@@ -1,8 +1,8 @@
 package ie.laposa.domain.mediaSource
 
-import android.text.BoringLayout
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
+import ie.laposa.domain.mediaSource.model.MediaSourceFileBase
 import ie.laposa.domain.mediaSource.model.MediaSourceType
 import ie.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
 import ie.laposa.domain.mediaSource.model.samba.SambaMediaProvider
@@ -11,6 +11,7 @@ import ie.laposa.domain.zeroConf.ZeroConfService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.reflect.KSuspendFunction1
 
 class MediaSourceService(
     private val zeroConf: ZeroConfService,
@@ -27,8 +28,12 @@ class MediaSourceService(
     val fileList: StateFlow<Map<String, List<MediaSourceFile>>> = sambaMediaProvider.filesList
     val sambaShares: StateFlow<Map<MediaSource, List<String>>?> = sambaMediaProvider.shares
 
-    suspend fun openShare(shareName: String) {
-        sambaMediaProvider.openShare(shareName)
+    suspend fun getContentOfDirectoryAthPath(path: String) : List<MediaSourceFileBase> {
+        return _currentMediaProvider?.getContentOfDirectoryAtPath(path) ?: emptyList()
+    }
+
+    suspend fun openShare(shareName: String) : List<MediaSourceFileBase> {
+        return sambaMediaProvider.openShare(shareName)
     }
 
     suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {

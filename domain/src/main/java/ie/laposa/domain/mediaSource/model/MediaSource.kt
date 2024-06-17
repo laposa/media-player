@@ -13,6 +13,10 @@ data class MediaSource(
     val connectionAddress: String? = null,
     val isConnected: Boolean = false,
 ) : Parcelable {
+
+    val key : String
+        get() = "$type-$displayName-$connectionAddress"
+    
     companion object {
         fun fromNSD(service: NsdServiceInfo): MediaSource {
             return MediaSource(

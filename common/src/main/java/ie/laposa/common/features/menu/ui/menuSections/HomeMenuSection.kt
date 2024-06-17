@@ -6,13 +6,20 @@ import androidx.compose.runtime.Composable
 import ie.laposa.common.features.home.ui.content.Dashboard
 
 @Composable
-fun HomeMenuSection(setHomeContent: (@Composable () -> Unit) -> Unit, onNavigateToPlayer: () -> Unit) {
+fun HomeMenuSection(
+    key: String,
+    selectedKey: String?,
+    onSelected: (key: String) -> Unit,
+    setHomeContent: (@Composable () -> Unit) -> Unit,
+    onNavigateToPlayer: () -> Unit
+) {
     MenuSection("Home") {
         SectionItem(
             "Dashboard",
             icon = Icons.Filled.Home,
-            focusedByDefault = true,
+            isSelected = selectedKey == key,
         ) {
+            onSelected(key)
             setHomeContent {
                 Dashboard(onNavigateToPlayer)
             }

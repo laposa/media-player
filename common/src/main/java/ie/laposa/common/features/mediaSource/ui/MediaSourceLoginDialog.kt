@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -34,7 +36,6 @@ import ie.laposa.common.ui.theme.ComponentsTheme
 @Composable
 fun MediaSourceLoginDialog(
     error: String?,
-    onDismiss: () -> Unit,
     onSubmit: (String?, String?) -> Unit
 ) {
     var userName by remember { mutableStateOf<String?>("frenkybojler") }
@@ -44,54 +45,53 @@ fun MediaSourceLoginDialog(
         onSubmit(userName, password)
     }
 
-    Dialog(onDismissRequest = {
-        onDismiss()
-    }) {
+    Box(
+        contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+    ) {
         Card(
-            colors = CardDefaults.cardColors().copy(containerColor = surfaceDark),
-            modifier = Modifier.shadow(12.dp, RoundedCornerShape(8.dp))
+            colors = CardDefaults.cardColors().copy(
+                containerColor = surfaceDark,
+            )
         ) {
-            Box(modifier = Modifier.padding(16.dp).background(Color.Transparent)) {
-                Column {
-                    Text(
-                        "Login to media source",
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextField(
-                        value = userName ?: "",
-                        onValueChange = { userName = it },
-                        label = { Text("User Name") },
-                        shape = RoundedCornerShape(12.dp),
-                        isError = error != null,
-                        colors = ComponentsTheme.textInputColors()
-                    )
+            Column(modifier = Modifier.padding(16.dp).background(Color.Transparent)) {
+                Text(
+                    "Login to media source",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = userName ?: "",
+                    onValueChange = { userName = it },
+                    label = { Text("User Name") },
+                    shape = RoundedCornerShape(12.dp),
+                    isError = error != null,
+                    colors = ComponentsTheme.textInputColors()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = password ?: "",
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    shape = RoundedCornerShape(12.dp),
+                    isError = error != null,
+                    colors = ComponentsTheme.textInputColors()
+                )
+                if (error != null) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = password ?: "",
-                        onValueChange = { password = it },
-                        label = { Text("Password") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        shape = RoundedCornerShape(12.dp),
-                        isError = error != null,
-                        colors = ComponentsTheme.textInputColors()
+                    Text(error, color = Color.Red)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { onLoginSubmit() },
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     )
-                    if (error != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(error, color = Color.Red)
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = { onLoginSubmit() },
-                        colors = ButtonDefaults.buttonColors().copy(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        )
-                    ) {
-                        Text("Login")
-                    }
+                ) {
+                    Text("Login")
                 }
             }
         }

@@ -3,6 +3,7 @@ package ie.laposa.domain.mediaSource.model.nfs
 import ie.laposa.domain.mediaSource.MediaSourceProvider
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
+import ie.laposa.domain.mediaSource.model.MediaSourceFileBase
 import ie.laposa.domain.networkProtocols.nfs.NfsService
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,14 @@ class NfsMediaProvider(
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun openShare(shareName: String) : List<MediaSourceFileBase> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> {
         TODO("Not yet implemented")
     }
 }
