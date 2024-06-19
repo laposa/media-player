@@ -63,6 +63,8 @@ class SmbService {
 
             val shares = serverService.shares0
 
+
+
             for (share in shares) {
                 if (!share.netName.contains("$")) {
                     _currentShares.update {
@@ -74,10 +76,15 @@ class SmbService {
                 }
             }
 
+            // Try to connect to some share to find out if current authentication have enough permissions
+            _currentShares.value.values.firstOrNull()?.let {
+                _currentSession?.connectShare(it.first())
+            }
+
             return@withContext true
         } catch (e: Exception) {
             e.printStackTrace()
-            throw WrongCredentialsException()
+            return@withContext false
         }
     }
 
@@ -91,73 +98,66 @@ class SmbService {
 
     suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> =
         withContext(Dispatchers.IO) {
-            if (path == "" && _currentShare == null) {
-                return@withContext _currentMediaSource?.let {
-                    _currentShares.value[it]?.map {
-                        MediaSourceShare(it)
-                    }
-                } ?: emptyList()
-            }
+            return@withContext getContentOfDirectoryAtPathInner(path)
+        }
 
-            return@withContext _currentShare?.let { share ->
-                share.list(path).mapNotNull { item ->
-                    println("Path: ${item.fileName}")
-                    if (EnumUtils.isSet(
-                            item.fileAttributes,
-                            FileAttributes.FILE_ATTRIBUTE_DIRECTORY
-                        ) && item.fileName != "." && item.fileName != ".."
-                    ) {
-                        MediaSourceDirectory(
+    private fun getContentOfDirectoryAtPathInner(path: String): List<MediaSourceFileBase> {
+        println("GET CONTENT AT PATH: $path")
+        if (path == "" && _currentShare == null) {
+            println("GETTING SHARES")
+            return _currentMediaSource?.let {
+                _currentShares.value[it]?.map {
+                    MediaSourceShare(it)
+                }
+            } ?: emptyList()
+        }
+        println("NOT GETTING SHARES: ")
+
+        return _currentShare?.let { share ->
+            share.list(path).mapNotNull { item ->
+                println("Path: ${item.fileName}")
+                if (EnumUtils.isSet(
+                        item.fileAttributes,
+                        FileAttributes.FILE_ATTRIBUTE_DIRECTORY
+                    ) && item.fileName != "." && item.fileName != ".."
+                ) {
+                    MediaSourceDirectory(
+                        item.fileName,
+                        path,
+                    )
+                } else {
+                    if (videoFilesExtensions.any {
+                            item.fileName.contains(it)
+                        }) {
+                        MediaSourceFile(
                             item.fileName,
                             path,
                         )
                     } else {
-                        if (videoFilesExtensions.any {
-                                item.fileName.contains(it)
-                            }) {
-                            MediaSourceFile(
-                                item.fileName,
-                                path,
-                            )
-                        } else {
-                            null
-                        }
+                        null
                     }
                 }
-            } ?: emptyList()
-        }
+            }
+        } ?: emptyList()
+    }
 
     suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
         return withContext(Dispatchers.IO) {
+            println("TADY 1")
             if (_currentShare == null || _currentShare?.smbPath?.shareName != shareName) {
                 _currentShare?.close()
-                _currentShare = (_currentSession?.connectShare(shareName) as DiskShare)
-            }
-            /*  _currentSession?.let {
-                if (_currentShare?.smbPath?.shareName != shareName || _currentShare == null) {
-                     _currentShare?.close()
-                     _currentShare = (it.connectShare(shareName) as DiskShare)
-                 }
+                println("TADY 2")
+                try {
+                    _currentShare = (_currentSession?.connectShare(shareName) as DiskShare)
+                    println("TADY 3")
+                } catch (exception: Exception) {
+                    println("TADY TO PADNE")
+                    println(exception.message)
+                }
 
-                 _currentShare?.let { share ->
-                     for (fileExtension in videoFilesExtensions) {
-                         val list = share.list("/", "*$fileExtension")
-                         _currentFilesList.update { filesMap ->
-                             val currentShareFilesList = filesMap[shareName] ?: emptyList()
-                             //TODO: Wrong
-                             filesMap[shareName] = currentShareFilesList.plus(list.map {
-                                 MediaSourceFile(
-                                     it.fileName,
-                                     it.fileName
-                                 )
-                             })
-                                 .distinctBy { it.fileName }
-                             filesMap
-                         }
-                     }
-                 }
-             }*/
-            return@withContext getContentOfDirectoryAtPath("/")
+            }
+            println("TADY 4")
+            getContentOfDirectoryAtPathInner("/")
         }
     }
 

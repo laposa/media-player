@@ -3,16 +3,15 @@ package ie.laposa.common.features.home.ui
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ie.laposa.common.features.common.ui.SavedStateHandleViewModel
-import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
+import ie.laposa.domain.savedState.SavedStateService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val savedStateHandleViewModel: SavedStateHandleViewModel
+    private val savedStateService: SavedStateService,
 ) : ViewModel() {
     private var _content: MutableStateFlow<(@Composable () -> Unit)?> = MutableStateFlow(null)
     val content: StateFlow<(@Composable () -> Unit)?> = _content
@@ -22,20 +21,19 @@ class HomeScreenViewModel @Inject constructor(
 
     fun showPlayer(fileToPlay: MediaSourceFile?, filePath: String?) {
         fileToPlay?.let {
-            savedStateHandleViewModel.setSelectedMedia(fileToPlay)
+            savedStateService.setSelectedMedia(fileToPlay)
         }
 
         filePath?.let {
-            savedStateHandleViewModel.setSelectedInputStreamDataSourceFileName(filePath)
+            savedStateService.setSelectedInputStreamDataSourceFileName(filePath)
         }
 
         _isPlayerVisible.value = true
     }
 
     fun hidePlayer() {
-        println("TADY JSEM KURVA")
-        savedStateHandleViewModel.clearSelectedMedia()
-        savedStateHandleViewModel.clearSelectedInputStreamDataSourceFileName()
+        savedStateService.clearSelectedMedia()
+        savedStateService.clearSelectedInputStreamDataSourceFileName()
         _isPlayerVisible.value = false
     }
 

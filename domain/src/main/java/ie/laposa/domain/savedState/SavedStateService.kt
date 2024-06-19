@@ -1,16 +1,16 @@
-package ie.laposa.common.features.common.ui
+package ie.laposa.domain.savedState
 
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
-import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
-import javax.inject.Inject
+import ie.laposa.domain.rememberLogin.RememberLogin
 
-class SavedStateHandleViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+class SavedStateService(
+    private val savedStateHandle: SavedStateHandle,
+    private val sharedPreferences: SharedPreferences,
+) {
     fun setSelectedMedia(media: MediaSourceFile) {
         savedStateHandle[KEY_SELECTED_MEDIA] = media
     }
@@ -35,6 +35,21 @@ class SavedStateHandleViewModel @Inject constructor(
         savedStateHandle[KEY_SELECTED_INPUT_STREAM_DATA_SOURCE] = null
     }
 
+    fun setRememberLogin(key: String, rememberLogin: RememberLogin) {
+        sharedPreferences.edit(commit = true) {
+            putString(key, rememberLogin.toJSON())
+        }
+    }
+
+    fun getRememberLogin(key: String): RememberLogin? {
+        return sharedPreferences.getString(key, null)?.let {
+            RememberLogin.fromJSON(it)
+        }
+    }
+
+    fun clearRememberLogin(key: String) {
+        savedStateHandle[key] = null
+    }
 
     companion object {
         private const val KEY_SELECTED_MEDIA = "selectedMedia"

@@ -9,10 +9,16 @@ import kotlinx.coroutines.flow.StateFlow
 
 abstract class MediaSourceProvider {
     abstract val filesList: StateFlow<Map<String, List<MediaSourceFile>>>
+    abstract suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean
+    abstract suspend fun connectToMediaSourceWithRememberedLogin(
+        mediaSource: MediaSource
+    ): Boolean
+
     abstract suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String? = null,
-        password: String? = null
+        password: String? = null,
+        remember: Boolean,
     ): Boolean
 
     abstract suspend fun getFile(

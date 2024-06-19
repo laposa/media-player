@@ -1,27 +1,21 @@
 package ie.laposa.common.features.mediaSource.ui
 
 import androidx.lifecycle.SavedStateHandle
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import ie.laposa.common.features.common.ViewModelBase
-import ie.laposa.common.features.common.ViewModelFactory
-import ie.laposa.common.features.common.ui.SavedStateHandleViewModel
 import ie.laposa.domain.mediaSource.MediaSourceService
 import ie.laposa.domain.mediaSource.model.MediaSource
 import ie.laposa.domain.mediaSource.model.MediaSourceDirectory
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.mediaSource.model.MediaSourceFileBase
 import ie.laposa.domain.mediaSource.model.MediaSourceType
+import ie.laposa.domain.savedState.SavedStateService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 
 class MediaSourceItemViewModel(
     private val selectedMediaSource: MediaSource,
     private val mediaSourceService: MediaSourceService,
-    private val savedStateHandleViewModel: SavedStateHandleViewModel
+    private val savedStateService: SavedStateService
 ) : ViewModelBase() {
     private val _isLoginViewModelVisible = MutableStateFlow(false)
     val isLoginDialogVisible: StateFlow<Boolean> = _isLoginViewModelVisible
@@ -47,8 +41,7 @@ class MediaSourceItemViewModel(
 
     fun goUp() {
         launch {
-            val files =
-                mediaSourceService.goBack()
+            val files = mediaSourceService.goBack()
             _files.value = files.second
         }
     }
@@ -68,20 +61,28 @@ class MediaSourceItemViewModel(
     }
 
     fun connectToMediaSource() {
-        showLoginDialog()
+        launch {
+            if (!mediaSourceService.tryToConnectToMediaSource(selectedMediaSource)) {
+                showLoginDialog()
+            } else {
+                onConnectionSuccess()
+            }
+        }
     }
 
-    fun onLoginSubmit(userName: String?, password: String?) {
+    fun onLoginSubmit(userName: String?, password: String?, remember: Boolean) {
         _loginDialogError.value = null
 
         launch(handleError = false) {
             try {
                 when (selectedMediaSource.type) {
                     is MediaSourceType.ZeroConf.SMB -> {
-                        connectToMediaSourceInternal(selectedMediaSource, userName, password)
+                        connectToMediaSourceInternal(
+                            selectedMediaSource, userName, password, remember
+                        )
                     }
 
-                    else -> connectToMediaSourceInternal(selectedMediaSource)
+                    else -> connectToMediaSourceInternal(selectedMediaSource, null, null, remember)
                 }
             } catch (e: Exception) {
                 _loginDialogError.value = e.message
@@ -94,11 +95,10 @@ class MediaSourceItemViewModel(
     }
 
     suspend fun onFileSelected(
-        sourceFile: MediaSourceFile,
-        playFile: (MediaSourceFile?, String?) -> Unit
+        sourceFile: MediaSourceFile, playFile: (MediaSourceFile?, String?) -> Unit
     ) {
         mediaSourceService.getFile(sourceFile.name)?.let {
-            savedStateHandleViewModel.setSelectedInputStreamDataSourceFileName(sourceFile.name)
+            savedStateService.setSelectedInputStreamDataSourceFileName(sourceFile.name)
             playFile(null, sourceFile.name)
         }
     }
@@ -107,19 +107,24 @@ class MediaSourceItemViewModel(
     private suspend fun connectToMediaSourceInternal(
         mediaSource: MediaSource,
         userName: String? = null,
-        password: String? = null
+        password: String? = null,
+        remember: Boolean,
     ) {
         when (mediaSource.type) {
             is MediaSourceType.ZeroConf.SMB -> {
-                mediaSourceService.connectToMediaSource(mediaSource, userName, password)
-                _files.value = mediaSourceService.getContentOfDirectoryAthPath("").second
+                mediaSourceService.connectToMediaSource(mediaSource, userName, password, remember)
             }
 
             else -> {
-                mediaSourceService.connectToMediaSource(mediaSource)
+                mediaSourceService.connectToMediaSource(mediaSource, null, null, remember)
             }
         }
 
+        onConnectionSuccess()
+    }
+
+    private suspend fun onConnectionSuccess() {
+        _files.value = mediaSourceService.getContentOfDirectoryAthPath("").second
         _isConnected.value = true
     }
 }
@@ -127,7 +132,7 @@ class MediaSourceItemViewModel(
 class MediaSourceItemViewModelFactory(
     private val savedStateHandle: SavedStateHandle,
     private val mediaSourceService: MediaSourceService,
-    private val savedStateHandleViewModel: SavedStateHandleViewModel
+    private val savedStateService: SavedStateService,
 ) {
     private var instances: MutableMap<String, MediaSourceItemViewModel> = mutableMapOf()
 
@@ -143,7 +148,7 @@ class MediaSourceItemViewModelFactory(
 
     private fun createInstance(mediaSource: MediaSource): MediaSourceItemViewModel {
         instances[getInstanceKey(mediaSource)] =
-            MediaSourceItemViewModel(mediaSource, mediaSourceService, savedStateHandleViewModel)
+            MediaSourceItemViewModel(mediaSource, mediaSourceService, savedStateService)
         savedStateHandle[INSTANCES_MAP_KEY] = instances
         return instances[getInstanceKey(mediaSource)]!!
     }

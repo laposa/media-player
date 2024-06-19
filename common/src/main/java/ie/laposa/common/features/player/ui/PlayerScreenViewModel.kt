@@ -3,24 +3,23 @@ package ie.laposa.common.features.player.ui
 import androidx.lifecycle.LiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ie.laposa.common.features.common.ViewModelBase
-import ie.laposa.common.features.common.ui.SavedStateHandleViewModel
-import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.mediaSource.MediaSourceService
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
+import ie.laposa.domain.savedState.SavedStateService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class PlayerScreenViewModel @Inject constructor(
-    private val savedStateHandleViewModel: SavedStateHandleViewModel,
+    private val savedStateService: SavedStateService,
     mediaSourceService: MediaSourceService,
 ) : ViewModelBase() {
-    val selectedMedia: LiveData<MediaSourceFile?> = savedStateHandleViewModel.getSelectedMedia()
+    val selectedMedia: LiveData<MediaSourceFile?> = savedStateService.getSelectedMedia()
 
     private val _selectedInputStreamDataSourceFile =
-        savedStateHandleViewModel.getSelectedInputStreamDataSourceFileName()
+        savedStateService.getSelectedInputStreamDataSourceFileName()
 
     private var _selectedInputStreamDataSourcePayload: MutableStateFlow<InputStreamDataSourcePayload?> =
         MutableStateFlow(null)
@@ -39,8 +38,8 @@ class PlayerScreenViewModel @Inject constructor(
     }
 
     fun clearSelectedMedia() {
-        savedStateHandleViewModel.clearSelectedMedia()
-        savedStateHandleViewModel.clearSelectedInputStreamDataSourceFileName()
+        savedStateService.clearSelectedMedia()
+        savedStateService.clearSelectedInputStreamDataSourceFileName()
         _selectedInputStreamDataSourcePayload.value = null
     }
 }

@@ -28,6 +28,7 @@ hierynomusSmbj = "0.13.0"
 dcerpc = "0.12.1"
 nfsClient = "1.1.0"
 appacheCommons = "2.9.0"
+gson = "2.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -76,6 +77,7 @@ hierynomusSmbj = { group = "com.hierynomus", name = "smbj", version.ref = "hiery
 dcerpc = { group = "com.rapid7.client", name = "dcerpc", version.ref = "dcerpc" }
 nfsClient = { group = "com.emc.ecs", name = "nfs-client", version.ref = "nfsClient" }
 vfs = { group = "org.apache.commons", name = "commons-vfs2", version.ref = "appacheCommons" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -18,10 +18,19 @@ class NfsMediaProvider(
         emptyMap()
     )
 
+    override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun connectToMediaSourceWithRememberedLogin(mediaSource: MediaSource): Boolean {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String?,
-        password: String?
+        password: String?,
+        remember: Boolean,
     ): Boolean {
         nfsService.connect(mediaSource)
         return true
@@ -31,7 +40,7 @@ class NfsMediaProvider(
         TODO("Not yet implemented")
     }
 
-    override suspend fun openShare(shareName: String) : List<MediaSourceFileBase> {
+    override suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
         TODO("Not yet implemented")
     }
 

@@ -2,8 +2,6 @@ package ie.laposa.common.features.sampleMedia.ui
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ie.laposa.common.features.common.ui.SavedStateHandleViewModel
-import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +9,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SampleMediaScreenViewModel @Inject constructor(
-    private val savedStateHandleViewModel: SavedStateHandleViewModel,
 ) : ViewModel() {
     private val _media = MutableStateFlow(
         listOf(
@@ -39,8 +36,4 @@ class SampleMediaScreenViewModel @Inject constructor(
     )
 
     val media: StateFlow<List<MediaSourceFile>> = _media
-
-    fun onMediaSelected(media: MediaSourceFile) {
-
-    }
 }

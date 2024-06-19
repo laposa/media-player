@@ -36,13 +36,16 @@ import ie.laposa.common.ui.theme.ComponentsTheme
 fun MediaSourceLoginDialog(
     error: String?,
     onDismiss: () -> Unit,
-    onSubmit: (String?, String?) -> Unit,
+    onSubmit: (String?, String?, Boolean) -> Unit,
 ) {
     var userName by remember { mutableStateOf<String?>("frenkybojler") }
     var password by remember { mutableStateOf<String?>("F98zi6o6") }
+    var remember by remember {
+        mutableStateOf(true)
+    }
 
     fun onLoginSubmit() {
-        onSubmit(userName, password)
+        onSubmit(userName, password, remember)
     }
 
     Dialog(onDismissRequest = onDismiss) {

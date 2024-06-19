@@ -6,10 +6,12 @@ import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.mediaSource.model.MediaSourceFileBase
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import ie.laposa.domain.networkProtocols.smb.SmbService
+import ie.laposa.domain.rememberLogin.RememberLoginService
 import kotlinx.coroutines.flow.StateFlow
 
 class SambaMediaProvider(
     private val smbService: SmbService,
+    private val rememberLoginService: RememberLoginService,
 ) : MediaSourceProvider() {
     override val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = smbService.filesList
     val shares: StateFlow<Map<MediaSource, List<String>>?> = smbService.shares
@@ -19,9 +21,17 @@ class SambaMediaProvider(
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String?,
-        password: String?
+        password: String?,
+        remember: Boolean,
     ): Boolean {
-        return smbService.connect(mediaSource, userName, password)
+        println("Connect to media source: $userName - $password - $remember")
+        val result = smbService.connect(mediaSource, userName, password)
+
+        if (result && remember) {
+            rememberLogin(mediaSource, userName, password)
+        }
+
+        return result
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {
@@ -41,7 +51,33 @@ class SambaMediaProvider(
         }
     }
 
+    override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
+        val result = connectToMediaSource(mediaSource, null, null, false)
+        println("Connection as a Guest: $result")
+        return result
+    }
+
+    override suspend fun connectToMediaSourceWithRememberedLogin(
+        mediaSource: MediaSource
+    ): Boolean {
+        val result = rememberLoginService.getRememberedLogin(mediaSource.key)?.let {
+            println("Remembered login: $it")
+            connectToMediaSource(mediaSource, it.userName, it.password, false)
+        } ?: false
+
+        println("Connection with remembered login: $result")
+
+        return result
+    }
+
     private fun getPathWithoutShareName(path: String): String {
         return currentShare?.let { path.removePrefix(it) } ?: path
+    }
+
+    private fun rememberLogin(mediaSource: MediaSource, userName: String?, password: String?) {
+        println("Remember login")
+        if (userName != null && password != null) {
+            rememberLoginService.rememberLogin(mediaSource.key, userName, password)
+        }
     }
 }

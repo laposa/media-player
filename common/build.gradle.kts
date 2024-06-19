@@ -70,5 +70,4 @@ dependencies {
     implementation(libs.androidx.compose.runtime.livedata)
 
     implementation(project(":domain"))
-    implementation(project(":bonsoir"))
 }

@@ -88,8 +88,8 @@ fun MediaSourceItem(
                     MediaSourceLoginDialog(
                         error,
                         {},
-                    ) { userName, password ->
-                        viewModel.onLoginSubmit(userName, password)
+                    ) { userName, password, remember ->
+                        viewModel.onLoginSubmit(userName, password, remember)
                     }
                 } else {
                     MediaSourceNotConnected(mediaSource.displayName) {

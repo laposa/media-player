@@ -1,6 +1,8 @@
 package ie.laposa.domain.di
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.lifecycle.SavedStateHandle
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,12 +13,45 @@ import ie.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
 import ie.laposa.domain.mediaSource.model.samba.SambaMediaProvider
 import ie.laposa.domain.networkProtocols.nfs.NfsService
 import ie.laposa.domain.networkProtocols.smb.SmbService
+import ie.laposa.domain.rememberLogin.RememberLoginService
+import ie.laposa.domain.savedState.SavedStateService
 import ie.laposa.domain.zeroConf.ZeroConfService
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object DomainModule {
+    @Singleton
+    @Provides
+    fun provideSavedStateHandle(): SavedStateHandle {
+        return SavedStateHandle()
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(
+        @ApplicationContext app: Context
+    ): SharedPreferences {
+        return app.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSavedStateService(
+        savedStateHandle: SavedStateHandle,
+        sharedPreferences: SharedPreferences,
+    ): SavedStateService {
+        return SavedStateService(savedStateHandle, sharedPreferences)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRememberLoginService(
+        savedStateService: SavedStateService
+    ): RememberLoginService {
+        return RememberLoginService(savedStateService)
+    }
+
     @Singleton
     @Provides
     fun provideZeroConfService(@ApplicationContext appContext: Context): ZeroConfService {
@@ -37,8 +72,11 @@ object DomainModule {
 
     @Singleton
     @Provides
-    fun provideSambaMediaProvider(smbService: SmbService): SambaMediaProvider {
-        return SambaMediaProvider(smbService)
+    fun provideSambaMediaProvider(
+        smbService: SmbService,
+        rememberLoginService: RememberLoginService
+    ): SambaMediaProvider {
+        return SambaMediaProvider(smbService, rememberLoginService)
     }
 
     @Singleton

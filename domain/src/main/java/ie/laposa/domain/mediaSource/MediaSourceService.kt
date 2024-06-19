@@ -16,7 +16,7 @@ import kotlin.reflect.KSuspendFunction1
 class MediaSourceService(
     private val zeroConf: ZeroConfService,
     private val sambaMediaProvider: SambaMediaProvider,
-    private val nfsMediaProvider: NfsMediaProvider,
+    nfsMediaProvider: NfsMediaProvider,
 ) {
     private val _mediaSources = MutableStateFlow(emptyList<MediaSource>())
     val mediaSources: StateFlow<List<MediaSource>> = _mediaSources
@@ -24,9 +24,6 @@ class MediaSourceService(
     private val _mediaProviders: List<MediaSourceProvider> =
         listOf(sambaMediaProvider, nfsMediaProvider)
     private var _currentMediaProvider: MediaSourceProvider? = null
-
-    val fileList: StateFlow<Map<String, List<MediaSourceFile>>> = sambaMediaProvider.filesList
-    val sambaShares: StateFlow<Map<MediaSource, List<String>>?> = sambaMediaProvider.shares
 
     private val _currentPath = MutableStateFlow<String>("")
     val currentPath: StateFlow<String> = _currentPath
@@ -48,7 +45,6 @@ class MediaSourceService(
         val pathOneLevelUpSplit = pathSplit.take(pathSplit.size - 1)
         return pathOneLevelUpSplit.joinToString("/")
     }
-
 
 
     suspend fun goBack(): Pair<String, List<MediaSourceFileBase>> {
@@ -85,7 +81,10 @@ class MediaSourceService(
     }
 
     suspend fun connectToMediaSource(
-        mediaSource: MediaSource, userName: String? = null, password: String? = null
+        mediaSource: MediaSource,
+        userName: String? = null,
+        password: String? = null,
+        remember: Boolean,
     ) {
         _currentMediaProvider = getMediaProvider(mediaSource)
 
@@ -95,9 +94,27 @@ class MediaSourceService(
                     mediaSource,
                     userName,
                     password,
+                    remember
                 )
             }
         }
+    }
+
+    suspend fun tryToConnectToMediaSource(mediaSource: MediaSource): Boolean {
+        _currentMediaProvider = getMediaProvider(mediaSource)
+
+        return _currentMediaProvider?.let {
+            if (!it.connectToMediaSourceAsAGuest(mediaSource)) {
+                if (!it.connectToMediaSourceWithRememberedLogin(mediaSource)) {
+                    println("Trying to connect without Login failure!")
+                    return@let false
+                }
+            }
+
+            println("Trying to connect without Login success!")
+            markMediaSourceAsConnected(mediaSource)
+            return@let true
+        } ?: false
     }
 
     private fun getMediaProvider(mediaSource: MediaSource): MediaSourceProvider? {
@@ -115,10 +132,13 @@ class MediaSourceService(
     }
 
     private suspend fun connectToZeroConfMediaSource(
-        mediaSource: MediaSource, userName: String? = null, password: String? = null
+        mediaSource: MediaSource,
+        userName: String? = null,
+        password: String? = null,
+        remember: Boolean,
     ) {
         val result = _currentMediaProvider?.connectToMediaSource(
-            mediaSource, userName, password
+            mediaSource, userName, password, remember
         ) == true
 
         if (result) {
