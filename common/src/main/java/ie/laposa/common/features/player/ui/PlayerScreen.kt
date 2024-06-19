@@ -34,7 +34,6 @@ fun PlayerScreen(
     DisposableEffect(Unit) {
         onDispose {
             viewModel.clearSelectedMedia()
-            println("TADY TAKY!!!!")
         }
     }
 

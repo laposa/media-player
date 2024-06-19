@@ -17,10 +17,10 @@ import kotlinx.coroutines.sync.withLock
 private const val TAG = "ZeroConfService"
 
 enum class ZeroConfServiceType(val id: String, private val secondaryId: String? = null) {
-    SMB("_smb._tcp.", "._smb._tcp"),
-    FTP("_ftp._tcp."),
-    WEBDAV("_webdav._tcp."),
-    NFS("_nfs._tcp.", "._nfs._tcp");
+    SMB("_smb._tcp.", "._smb._tcp"), FTP("_ftp._tcp."), WEBDAV("_webdav._tcp."), NFS(
+        "_nfs._tcp.",
+        "._nfs._tcp"
+    );
 
     fun isType(id: String): Boolean {
         return id.contains(this.id) || (secondaryId != null && id.contains(secondaryId))
@@ -49,9 +49,7 @@ class ZeroConfService(context: Context) {
         discoveryStarted = true
         for (serviceType in serviceTypes) {
             nsdManager.discoverServices(
-                serviceType,
-                NsdManager.PROTOCOL_DNS_SD,
-                getDiscoveryListener(this)
+                serviceType, NsdManager.PROTOCOL_DNS_SD, getDiscoveryListener(this)
             )
         }
     }
@@ -67,7 +65,6 @@ class ZeroConfService(context: Context) {
     suspend fun resolveServiceById(
         serviceId: String,
     ): NsdServiceInfo? {
-        println("Resolving service by id: $serviceId")
         val service = _discoveredServices.value.find { it.serviceType == serviceId }
 
         if (service != null) {
@@ -86,14 +83,12 @@ class ZeroConfService(context: Context) {
 
             override fun onServiceFound(service: NsdServiceInfo) {
                 Log.d(
-                    TAG,
-                    "Service discovery success | ${service.serviceName}: ${service.attributes}"
+                    TAG, "Service discovery success | ${service.serviceName}: ${service.attributes}"
                 )
 
                 coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     lock.withLock {
-                        resolveService(service)
-                        /*_discoveredServices.emit((_discoveredServices.value + service).distinctBy {
+                        resolveService(service)/*_discoveredServices.emit((_discoveredServices.value + service).distinctBy {
                             it.serviceName
                         })*/
                     }
@@ -128,26 +123,25 @@ class ZeroConfService(context: Context) {
 
     private fun createResolveListener(
         coroutineScope: CoroutineScope,
-    ) =
-        object : NsdManager.ResolveListener {
-            override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-                Log.e(TAG, "Resolve failed: $errorCode")
-            }
+    ) = object : NsdManager.ResolveListener {
+        override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+            Log.e(TAG, "Resolve failed: $errorCode")
+        }
 
-            override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
-                coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    Log.i(TAG, "Resolve Succeeded. $serviceInfo")
-                    lock.withLock {
-                        val services = _discoveredServices.value
-                        val index =
-                            services.indexOfFirst { it.serviceName == serviceInfo.serviceName && it.host == serviceInfo.host && it.serviceType == serviceInfo.serviceType }
-                        if (index != -1) {
-                            services.removeAt(index)
-                        }
-
-                        _discoveredServices.emit((services + serviceInfo).toMutableList())
+        override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
+            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                Log.i(TAG, "Resolve Succeeded. $serviceInfo")
+                lock.withLock {
+                    val services = _discoveredServices.value
+                    val index =
+                        services.indexOfFirst { it.serviceName == serviceInfo.serviceName && it.host == serviceInfo.host && it.serviceType == serviceInfo.serviceType }
+                    if (index != -1) {
+                        services.removeAt(index)
                     }
+
+                    _discoveredServices.emit((services + serviceInfo).toMutableList())
                 }
             }
         }
+    }
 }

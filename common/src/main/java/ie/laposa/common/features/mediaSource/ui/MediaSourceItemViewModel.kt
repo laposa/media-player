@@ -142,7 +142,6 @@ class MediaSourceItemViewModelFactory(
 
     fun create(mediaSource: MediaSource): MediaSourceItemViewModel {
         val result = instances[getInstanceKey(mediaSource)] ?: createInstance(mediaSource)
-        println(instances.keys)
         return result
     }
 

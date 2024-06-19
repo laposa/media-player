@@ -24,7 +24,6 @@ class SambaMediaProvider(
         password: String?,
         remember: Boolean,
     ): Boolean {
-        println("Connect to media source: $userName - $password - $remember")
         val result = smbService.connect(mediaSource, userName, password)
 
         if (result && remember) {
@@ -53,7 +52,6 @@ class SambaMediaProvider(
 
     override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
         val result = connectToMediaSource(mediaSource, null, null, false)
-        println("Connection as a Guest: $result")
         return result
     }
 
@@ -61,11 +59,8 @@ class SambaMediaProvider(
         mediaSource: MediaSource
     ): Boolean {
         val result = rememberLoginService.getRememberedLogin(mediaSource.key)?.let {
-            println("Remembered login: $it")
             connectToMediaSource(mediaSource, it.userName, it.password, false)
         } ?: false
-
-        println("Connection with remembered login: $result")
 
         return result
     }
@@ -75,7 +70,6 @@ class SambaMediaProvider(
     }
 
     private fun rememberLogin(mediaSource: MediaSource, userName: String?, password: String?) {
-        println("Remember login")
         if (userName != null && password != null) {
             rememberLoginService.rememberLogin(mediaSource.key, userName, password)
         }

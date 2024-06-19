@@ -6,7 +6,6 @@ class RememberLoginService(
     private val savedStateService: SavedStateService,
 ) {
     fun rememberLogin(mediaSourceIdentifier: String, userName: String, password: String) {
-        println("Remember login for: $mediaSourceIdentifier")
         savedStateService.setRememberLogin(mediaSourceIdentifier, RememberLogin(userName, password))
     }
 

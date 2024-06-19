@@ -36,8 +36,6 @@ class MediaSourceService(
         } else {
             _currentPath.value = newPath
         }
-
-        println("New path: ${_currentPath.value}")
     }
 
     private fun getOneLevelUpFromCurrentPath(): String {
@@ -106,12 +104,10 @@ class MediaSourceService(
         return _currentMediaProvider?.let {
             if (!it.connectToMediaSourceAsAGuest(mediaSource)) {
                 if (!it.connectToMediaSourceWithRememberedLogin(mediaSource)) {
-                    println("Trying to connect without Login failure!")
                     return@let false
                 }
             }
 
-            println("Trying to connect without Login success!")
             markMediaSourceAsConnected(mediaSource)
             return@let true
         } ?: false

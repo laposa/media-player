@@ -102,20 +102,15 @@ class SmbService {
         }
 
     private fun getContentOfDirectoryAtPathInner(path: String): List<MediaSourceFileBase> {
-        println("GET CONTENT AT PATH: $path")
         if (path == "" && _currentShare == null) {
-            println("GETTING SHARES")
             return _currentMediaSource?.let {
                 _currentShares.value[it]?.map {
                     MediaSourceShare(it)
                 }
             } ?: emptyList()
         }
-        println("NOT GETTING SHARES: ")
-
         return _currentShare?.let { share ->
             share.list(path).mapNotNull { item ->
-                println("Path: ${item.fileName}")
                 if (EnumUtils.isSet(
                         item.fileAttributes,
                         FileAttributes.FILE_ATTRIBUTE_DIRECTORY
@@ -143,20 +138,14 @@ class SmbService {
 
     suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
         return withContext(Dispatchers.IO) {
-            println("TADY 1")
             if (_currentShare == null || _currentShare?.smbPath?.shareName != shareName) {
                 _currentShare?.close()
-                println("TADY 2")
                 try {
                     _currentShare = (_currentSession?.connectShare(shareName) as DiskShare)
-                    println("TADY 3")
                 } catch (exception: Exception) {
-                    println("TADY TO PADNE")
                     println(exception.message)
                 }
-
             }
-            println("TADY 4")
             getContentOfDirectoryAtPathInner("/")
         }
     }

@@ -25,7 +25,6 @@ class NfsService {
         // Example operation: List files in the directory
         if (nfsFile.exists() && nfsFile.isFolder()) {
             val children: Array<FileObject> = nfsFile.getChildren()
-            System.out.println("Children of " + nfsFile.getName().getURI())
             for (child in children) {
                 println(child.name.baseName)
             }
