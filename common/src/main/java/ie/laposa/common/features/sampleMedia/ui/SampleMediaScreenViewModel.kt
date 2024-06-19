@@ -41,12 +41,6 @@ class SampleMediaScreenViewModel @Inject constructor(
     val media: StateFlow<List<MediaSourceFile>> = _media
 
     fun onMediaSelected(media: MediaSourceFile) {
-        savedStateHandleViewModel.setSelectedMedia(
-            Media(
-                media.name,
-                media.path,
-                thumbnailUrl = media.thumbnailUrl,
-            )
-        )
+
     }
 }

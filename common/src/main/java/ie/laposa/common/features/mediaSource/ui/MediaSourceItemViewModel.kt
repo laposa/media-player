@@ -29,6 +29,8 @@ class MediaSourceItemViewModel(
     private val _files = MutableStateFlow<List<MediaSourceFileBase>>(emptyList())
     val files: StateFlow<List<MediaSourceFileBase>> = _files
 
+    val path: StateFlow<String> = mediaSourceService.currentPath
+
     private val _loginDialogError = MutableStateFlow<String?>(null)
     val loginDialogError: StateFlow<String?> = _loginDialogError
 
@@ -37,8 +39,17 @@ class MediaSourceItemViewModel(
 
     fun openDirectory(directory: MediaSourceDirectory) {
         launch {
-            val files = mediaSourceService.getContentOfDirectoryAthPath("${directory.path}${directory.name}")
-            _files.value = files
+            val files =
+                mediaSourceService.getContentOfDirectoryAthPath("${directory.path}${directory.name}")
+            _files.value = files.second
+        }
+    }
+
+    fun goUp() {
+        launch {
+            val files =
+                mediaSourceService.goBack()
+            _files.value = files.second
         }
     }
 
@@ -82,11 +93,16 @@ class MediaSourceItemViewModel(
         }
     }
 
-    suspend fun onFileSelected(sourceFile: MediaSourceFile) {
+    suspend fun onFileSelected(
+        sourceFile: MediaSourceFile,
+        playFile: (MediaSourceFile?, String?) -> Unit
+    ) {
         mediaSourceService.getFile(sourceFile.name)?.let {
             savedStateHandleViewModel.setSelectedInputStreamDataSourceFileName(sourceFile.name)
+            playFile(null, sourceFile.name)
         }
     }
+
 
     private suspend fun connectToMediaSourceInternal(
         mediaSource: MediaSource,
@@ -96,7 +112,7 @@ class MediaSourceItemViewModel(
         when (mediaSource.type) {
             is MediaSourceType.ZeroConf.SMB -> {
                 mediaSourceService.connectToMediaSource(mediaSource, userName, password)
-                _files.value = mediaSourceService.getContentOfDirectoryAthPath("")
+                _files.value = mediaSourceService.getContentOfDirectoryAthPath("").second
             }
 
             else -> {
@@ -113,7 +129,8 @@ class MediaSourceItemViewModelFactory(
     private val mediaSourceService: MediaSourceService,
     private val savedStateHandleViewModel: SavedStateHandleViewModel
 ) {
-    private var instances : MutableMap<String, MediaSourceItemViewModel> = mutableMapOf()
+    private var instances: MutableMap<String, MediaSourceItemViewModel> = mutableMapOf()
+
     init {
         instances = savedStateHandle[INSTANCES_MAP_KEY] ?: mutableMapOf()
     }
@@ -124,13 +141,14 @@ class MediaSourceItemViewModelFactory(
         return result
     }
 
-    private fun createInstance(mediaSource: MediaSource) : MediaSourceItemViewModel{
-        instances[getInstanceKey(mediaSource)] = MediaSourceItemViewModel(mediaSource, mediaSourceService, savedStateHandleViewModel)
+    private fun createInstance(mediaSource: MediaSource): MediaSourceItemViewModel {
+        instances[getInstanceKey(mediaSource)] =
+            MediaSourceItemViewModel(mediaSource, mediaSourceService, savedStateHandleViewModel)
         savedStateHandle[INSTANCES_MAP_KEY] = instances
         return instances[getInstanceKey(mediaSource)]!!
     }
 
-    private fun getInstanceKey(mediaSource: MediaSource) : String {
+    private fun getInstanceKey(mediaSource: MediaSource): String {
         return mediaSource.key
     }
 

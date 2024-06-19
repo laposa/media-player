@@ -7,11 +7,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import ie.laposa.common.features.mediaSource.ui.LocalMediaSourceItemViewModelFactory
 import ie.laposa.common.features.mediaSource.ui.MediaSourceItem
+import ie.laposa.domain.mediaSource.model.MediaSourceFile
 
 @Composable
 fun ZeroConfMenuSection(
     setHomeContent: (@Composable () -> Unit) -> Unit,
-    navigateToPlayer: () -> Unit,
+    navigateToPlayer: (MediaSourceFile?, String?) -> Unit,
     key: String,
     selectedKey: String?,
     onSelected: (key: String) -> Unit,
@@ -27,17 +28,19 @@ fun ZeroConfMenuSection(
 
     MenuSection("Network") {
         Column {
-            for (source in mediaSources.sortedBy { it.type.toString() + it.displayName }) {
-                MediaSourceItem(
-                    mediaSource = source,
-                    setHomeContent = setHomeContent,
-                    navigateToPlayer = navigateToPlayer,
-                    viewModelFactory = mediaSourceItemViewModelFactory,
-                    key = "$key-${source.key}",
-                    onSelected = onSelected,
-                    selectedKey = selectedKey
-                )
-            }
+            mediaSources.sortedBy { it.type.toString() + it.displayName }
+                .forEachIndexed { index, source ->
+                    MediaSourceItem(
+                        mediaSource = source,
+                        setHomeContent = setHomeContent,
+                        navigateToPlayer = navigateToPlayer,
+                        viewModelFactory = mediaSourceItemViewModelFactory,
+                        key = "$key-${source.key}",
+                        onSelected = onSelected,
+                        selectedKey = selectedKey,
+                        index = index,
+                    )
+                }
         }
     }
 }

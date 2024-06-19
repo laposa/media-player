@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import ie.laposa.common.features.home.ui.Home
 import ie.laposa.common.features.player.ui.PlayerScreen
-import ie.laposa.common.features.sampleMedia.ui.SampleMediaScreen
 
 @Composable
 fun VideoPlayerApp(appState: VideoPlayerAppState = rememberVideoPlayerAppState()) {
@@ -14,7 +13,7 @@ fun VideoPlayerApp(appState: VideoPlayerAppState = rememberVideoPlayerAppState()
 }
 
 @Composable
-private fun GlobalNavigationContainer(
+fun GlobalNavigationContainer(
     appState: VideoPlayerAppState,
     content: @Composable () -> Unit
 ) {
@@ -28,14 +27,11 @@ private fun Route(appState: VideoPlayerAppState) {
         navController = appState.navHostController,
         startDestination = Screen.Home.route
     ) {
-        composable(Screen.Home.route) { GlobalNavigationContainer(appState = appState) { Home(                 navigateToPlayer = appState::navigateToPlayer) } }
-        composable(Screen.Player.route) { GlobalNavigationContainer(appState = appState) { PlayerScreen() } }
-        composable(Screen.SampleMediaLib.route) {
+        composable(Screen.Home.route) {
             GlobalNavigationContainer(appState = appState) {
-                SampleMediaScreen(
-                    navigateToPlayer = appState::navigateToPlayer
-                )
+                Home()
             }
         }
+        composable(Screen.Player.route) { GlobalNavigationContainer(appState = appState) { PlayerScreen({}) } }
     }
 }

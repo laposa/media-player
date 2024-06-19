@@ -44,7 +44,7 @@ fun MediaItem(
 
     LaunchedEffect(Unit) {
         if (index == 0) {
-            //focusRequester.requestFocus()
+            focusRequester.requestFocus()
         }
     }
 
@@ -95,7 +95,7 @@ fun MediaItem(
 
                     is MediaSourceGoUp -> {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_top_left),
+                            painter = painterResource(id = R.drawable.ic_move_up),
                             contentDescription = media.name,
                             Modifier
                                 .size(56.dp)

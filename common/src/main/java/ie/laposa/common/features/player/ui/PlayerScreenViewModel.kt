@@ -6,6 +6,7 @@ import ie.laposa.common.features.common.ViewModelBase
 import ie.laposa.common.features.common.ui.SavedStateHandleViewModel
 import ie.laposa.common.features.mediaLib.model.Media
 import ie.laposa.domain.mediaSource.MediaSourceService
+import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +17,7 @@ class PlayerScreenViewModel @Inject constructor(
     private val savedStateHandleViewModel: SavedStateHandleViewModel,
     mediaSourceService: MediaSourceService,
 ) : ViewModelBase() {
-
-    val selectedMedia: LiveData<Media?> = savedStateHandleViewModel.getSelectedMedia()
+    val selectedMedia: LiveData<MediaSourceFile?> = savedStateHandleViewModel.getSelectedMedia()
 
     private val _selectedInputStreamDataSourceFile =
         savedStateHandleViewModel.getSelectedInputStreamDataSourceFileName()

@@ -13,25 +13,31 @@ class SambaMediaProvider(
 ) : MediaSourceProvider() {
     override val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = smbService.filesList
     val shares: StateFlow<Map<MediaSource, List<String>>?> = smbService.shares
+
+    private var currentShare: String? = null
+
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         userName: String?,
         password: String?
-    ) : Boolean {
-       return smbService.connect(mediaSource, userName, password)
+    ): Boolean {
+        return smbService.connect(mediaSource, userName, password)
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {
-        val file = smbService.openFile(fileName)
-        println("File opened: $file")
-        return file
+        return smbService.openFile(fileName)
     }
 
     override suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
+        currentShare = shareName
         return smbService.openShare(shareName)
     }
 
     override suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> {
-        return smbService.getContentOfDirectoryAtPath(path)
+        return if (path == "" && currentShare != null) {
+            smbService.getCurrentShares()
+        } else {
+            smbService.getContentOfDirectoryAtPath(path)
+        }
     }
 }

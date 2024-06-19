@@ -1,5 +1,8 @@
 package ie.laposa.domain.mediaSource.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 sealed class MediaSourceFileBase {
     abstract val name: String
 }
@@ -9,7 +12,7 @@ class MediaSourceShare(
 ) : MediaSourceFileBase()
 
 class MediaSourceGoUp(
-    override val name: String = "up"
+    override val name: String = "Go Back"
 ) : MediaSourceFileBase()
 
 abstract class MediaSourceFileWithPath : MediaSourceFileBase() {
@@ -17,11 +20,12 @@ abstract class MediaSourceFileWithPath : MediaSourceFileBase() {
     abstract val path: String
 }
 
-class MediaSourceFile(
+@Parcelize
+data class MediaSourceFile(
     override val name: String,
     override val path: String,
     val thumbnailUrl: String? = null,
-) : MediaSourceFileWithPath()
+) : MediaSourceFileWithPath(), Parcelable
 
 class MediaSourceDirectory(override val name: String, override val path: String) :
     MediaSourceFileWithPath()

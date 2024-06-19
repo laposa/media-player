@@ -17,10 +17,6 @@ class VideoPlayerAppState(
         navHostController.navigate(route)
     }
 
-    fun navigateToSampleMediaLib() {
-        navigateTo(Screen.SampleMediaLib.route)
-    }
-
     fun navigateToPlayer() {
         navigateTo(Screen.Player.route)
     }
@@ -40,11 +36,15 @@ sealed interface Screen {
         override val route = "/home"
     }
 
-    data object SampleMediaLib : Screen {
-        override val route = "/sampleMediaLib"
-    }
-
     data object Player : Screen {
         override val route = "/player"
+    }
+
+    data object DashBoard : Screen {
+        override val route: String = "/dashboard"
+    }
+
+    data object ZeroConf : Screen {
+        override val route: String = "/zeroconf"
     }
 }

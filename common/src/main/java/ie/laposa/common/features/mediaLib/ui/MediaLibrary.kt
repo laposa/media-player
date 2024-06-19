@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,37 +33,22 @@ import ie.laposa.domain.mediaSource.model.MediaSourceGoUp
 fun MediaLibrary(
     title: String,
     files: StateFlow<List<MediaSourceFileBase>>,
+    path: String,
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onGoUp: () -> Unit,
 ) {
     val currentFiles = files.collectAsState().value
-
-    var path by remember {
-        mutableStateOf("")
-    }
-
-    fun updatePath(newPath: String) {
-        path = newPath
-    }
-
-    fun onMediaDirectorySelected(directory: MediaSourceDirectory) {
-        updatePath(directory.path)
-        onMediaDirectorySelect(directory)
-    }
-
-    fun onMediaShareSelected(share: MediaSourceShare) {
-        updatePath(share.name)
-        onMediaShareSelect(share)
-    }
 
     MediaLibraryInner(
         title,
         currentFiles,
         path,
         onMediaFileSelect,
-        ::onMediaDirectorySelected,
-        ::onMediaShareSelected
+        onMediaDirectorySelect,
+        onMediaShareSelect,
+        onGoUp
     )
 }
 
@@ -74,42 +60,26 @@ private fun MediaLibraryInner(
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onGoUp: () -> Unit,
 ) {
     fun getCurrentFiles(): List<MediaSourceFileBase> {
         fun getPathDepthLevel(): Int {
             return path.split("/").size
         }
 
-        if (getPathDepthLevel() > 1) {
+        if (getPathDepthLevel() >= 1 && path.isNotEmpty()) {
             return listOf(MediaSourceGoUp()) + files
         }
 
         return files
     }
 
-    fun onGoUp() {
-        fun getDirectoryOneLevelUp(): MediaSourceDirectory {
-            val pathSplit = path.split("/")
-            val pathOneLevelUpSplit = pathSplit.take(pathSplit.size - 1)
-            val currentPath = pathOneLevelUpSplit.joinToString("/")
-            val name = pathOneLevelUpSplit.last()
-
-            println("Go up from: $path to: $currentPath")
-
-            return MediaSourceDirectory(
-                name = name,
-                path = currentPath
-            )
-        }
-
-        onMediaDirectorySelect(
-            getDirectoryOneLevelUp()
-        )
+    fun getCurrentTitle(): String {
+        return if (path.isNotEmpty()) "$title > ${path.split("/").joinToString(" > ")}" else title
     }
 
-
     Column {
-        Text(title, style = MaterialTheme.typography.titleLarge, color = Color.White)
+        Text(getCurrentTitle(), style = MaterialTheme.typography.titleLarge, color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(
             columns = GridCells.Adaptive(128.dp),
@@ -122,11 +92,7 @@ private fun MediaLibraryInner(
                 val index = currentFiles.indexOf(mediaItem)
                 MediaItem(mediaItem, index) {
                     onMediaSelect(
-                        it,
-                        onMediaFileSelect,
-                        onMediaDirectorySelect,
-                        onMediaShareSelect,
-                        ::onGoUp
+                        it, onMediaFileSelect, onMediaDirectorySelect, onMediaShareSelect, onGoUp
                     )
                 }
             }

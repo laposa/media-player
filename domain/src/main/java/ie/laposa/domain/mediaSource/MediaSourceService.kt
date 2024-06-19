@@ -28,11 +28,47 @@ class MediaSourceService(
     val fileList: StateFlow<Map<String, List<MediaSourceFile>>> = sambaMediaProvider.filesList
     val sambaShares: StateFlow<Map<MediaSource, List<String>>?> = sambaMediaProvider.shares
 
-    suspend fun getContentOfDirectoryAthPath(path: String) : List<MediaSourceFileBase> {
-        return _currentMediaProvider?.getContentOfDirectoryAtPath(path) ?: emptyList()
+    private val _currentPath = MutableStateFlow<String>("")
+    val currentPath: StateFlow<String> = _currentPath
+
+    private var _currentShareName = ""
+
+    private fun updateCurrentPath(newPath: String, fromGoBack: Boolean = false) {
+        if (newPath != _currentPath.value && !fromGoBack) {
+            _currentPath.value += if (!newPath.contains("/") && _currentPath.value.isNotEmpty()) "/$newPath" else newPath
+        } else {
+            _currentPath.value = newPath
+        }
+
+        println("New path: ${_currentPath.value}")
     }
 
-    suspend fun openShare(shareName: String) : List<MediaSourceFileBase> {
+    private fun getOneLevelUpFromCurrentPath(): String {
+        val pathSplit = _currentPath.value.split("/")
+        val pathOneLevelUpSplit = pathSplit.take(pathSplit.size - 1)
+        return pathOneLevelUpSplit.joinToString("/")
+    }
+
+    private fun getPathWithoutShareName(path: String): String {
+        return path.removePrefix(_currentShareName)
+    }
+
+    suspend fun goBack(): Pair<String, List<MediaSourceFileBase>> {
+        updateCurrentPath(getOneLevelUpFromCurrentPath(), true)
+        return getContentOfDirectoryAthPath(_currentPath.value)
+    }
+
+    suspend fun getContentOfDirectoryAthPath(path: String): Pair<String, List<MediaSourceFileBase>> {
+        updateCurrentPath(path)
+        return _currentPath.value to (_currentMediaProvider?.getContentOfDirectoryAtPath(
+            getPathWithoutShareName(_currentPath.value)
+        )
+            ?: emptyList())
+    }
+
+    suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
+        updateCurrentPath(shareName)
+        _currentShareName = shareName
         return sambaMediaProvider.openShare(shareName)
     }
 
@@ -51,9 +87,7 @@ class MediaSourceService(
     }
 
     suspend fun connectToMediaSource(
-        mediaSource: MediaSource,
-        userName: String? = null,
-        password: String? = null
+        mediaSource: MediaSource, userName: String? = null, password: String? = null
     ) {
         _currentMediaProvider = getMediaProvider(mediaSource)
 
@@ -83,24 +117,20 @@ class MediaSourceService(
     }
 
     private suspend fun connectToZeroConfMediaSource(
-        mediaSource: MediaSource,
-        userName: String? = null,
-        password: String? = null
+        mediaSource: MediaSource, userName: String? = null, password: String? = null
     ) {
         val result = _currentMediaProvider?.connectToMediaSource(
-            mediaSource,
-            userName,
-            password
+            mediaSource, userName, password
         ) == true
 
-        if(result) {
+        if (result) {
             markMediaSourceAsConnected(mediaSource)
         }
     }
 
     private fun markMediaSourceAsConnected(mediaSource: MediaSource) {
         _mediaSources.value = _mediaSources.value.map {
-            if(it == mediaSource) {
+            if (it == mediaSource) {
                 it.copy(isConnected = true)
             } else {
                 it

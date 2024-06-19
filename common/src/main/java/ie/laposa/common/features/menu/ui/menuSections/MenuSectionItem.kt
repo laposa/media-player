@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Surface
+import androidx.tv.material3.Text
 import ie.laposa.common.theme.VideoPlayerTypography
 import androidx.compose.material3.Icon as IconCompose
 
@@ -70,7 +70,6 @@ fun SectionItem(
             .focusRequester(focusRequester)
             .clickable { onClick() }
             .fillMaxWidth(),
-        color = if (isSelected) Color.White else Color.Transparent
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

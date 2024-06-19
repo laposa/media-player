@@ -47,7 +47,6 @@ class SmbService {
         port: Int = 445,
     ) = withContext(Dispatchers.IO) {
         _currentMediaSource = mediaSource
-        println("Connecting to $userName, $password")
         try {
             val connection = client.connect(mediaSource.connectionAddress, port)
             val authContext =
@@ -58,8 +57,6 @@ class SmbService {
                 }
 
             _currentSession = connection.authenticate(authContext)
-
-            println("Connected to ${mediaSource.connectionAddress}")
 
             val transport = SMBTransportFactories.SRVSVC.getTransport(_currentSession)
             val serverService = ServerService(transport)
@@ -84,6 +81,14 @@ class SmbService {
         }
     }
 
+    suspend fun getCurrentShares(): List<MediaSourceShare> = withContext(Dispatchers.IO) {
+        return@withContext _currentMediaSource?.let {
+            _currentShares.value[it]?.map {
+                MediaSourceShare(it)
+            }
+        } ?: emptyList()
+    }
+
     suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> =
         withContext(Dispatchers.IO) {
             if (path == "" && _currentShare == null) {
@@ -96,6 +101,7 @@ class SmbService {
 
             return@withContext _currentShare?.let { share ->
                 share.list(path).mapNotNull { item ->
+                    println("Path: ${item.fileName}")
                     if (EnumUtils.isSet(
                             item.fileAttributes,
                             FileAttributes.FILE_ATTRIBUTE_DIRECTORY

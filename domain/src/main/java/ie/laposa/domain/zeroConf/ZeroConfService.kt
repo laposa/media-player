@@ -33,6 +33,8 @@ class ZeroConfService(context: Context) {
     private val nsdManager: NsdManager = (context.getSystemService(NSD_SERVICE) as NsdManager)
     private val lock = Mutex()
 
+    private var discoveryStarted = false
+
     private val _discoveredServices: MutableStateFlow<MutableList<NsdServiceInfo>> =
         MutableStateFlow(
             mutableListOf()
@@ -40,8 +42,11 @@ class ZeroConfService(context: Context) {
 
     val discoveredServices: StateFlow<List<NsdServiceInfo>> = _discoveredServices
     suspend fun startDiscovery() = coroutineScope {
+        if (discoveryStarted) return@coroutineScope
+
         Log.i(TAG, "Starting discovery")
 
+        discoveryStarted = true
         for (serviceType in serviceTypes) {
             nsdManager.discoverServices(
                 serviceType,

@@ -4,22 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import ie.laposa.common.features.mediaLib.model.Media
+import ie.laposa.domain.mediaSource.model.MediaSourceFile
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import javax.inject.Inject
 
 class SavedStateHandleViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    fun setSelectedMedia(media: Media) {
+    fun setSelectedMedia(media: MediaSourceFile) {
         savedStateHandle[KEY_SELECTED_MEDIA] = media
     }
 
-    fun getSelectedMedia(): LiveData<Media?> {
+    fun getSelectedMedia(): LiveData<MediaSourceFile?> {
         return savedStateHandle.getLiveData(KEY_SELECTED_MEDIA)
     }
 
     fun clearSelectedMedia() {
-        savedStateHandle.remove<Media>(KEY_SELECTED_MEDIA)
+        savedStateHandle[KEY_SELECTED_MEDIA] = null
     }
 
     fun setSelectedInputStreamDataSourceFileName(fileName: String) {
@@ -31,7 +32,7 @@ class SavedStateHandleViewModel @Inject constructor(
     }
 
     fun clearSelectedInputStreamDataSourceFileName() {
-        savedStateHandle.remove<InputStreamDataSourcePayload>(KEY_SELECTED_INPUT_STREAM_DATA_SOURCE)
+        savedStateHandle[KEY_SELECTED_INPUT_STREAM_DATA_SOURCE] = null
     }
 
 
