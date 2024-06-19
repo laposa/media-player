@@ -94,7 +94,7 @@ class MediaSourceService(
                     password,
                     remember
                 )
-            }
+            } else -> {}
         }
     }
 

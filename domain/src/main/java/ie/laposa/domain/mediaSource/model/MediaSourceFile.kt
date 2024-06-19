@@ -25,6 +25,7 @@ data class MediaSourceFile(
     override val name: String,
     override val path: String,
     val thumbnailUrl: String? = null,
+    val type: MediaSourceType? = null,
 ) : MediaSourceFileWithPath(), Parcelable
 
 class MediaSourceDirectory(override val name: String, override val path: String) :

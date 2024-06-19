@@ -14,9 +14,9 @@ data class MediaSource(
     val isConnected: Boolean = false,
 ) : Parcelable {
 
-    val key : String
+    val key: String
         get() = "$type-$displayName-$connectionAddress"
-    
+
     companion object {
         fun fromNSD(service: NsdServiceInfo): MediaSource {
             return MediaSource(
@@ -35,6 +35,8 @@ data class MediaSource(
 
 @Parcelize
 sealed class MediaSourceType : Parcelable {
+    data object Url : MediaSourceType()
+
     @Parcelize
     sealed class ZeroConf(val type: ZeroConfServiceType) : MediaSourceType() {
         data object SMB : ZeroConf(ZeroConfServiceType.SMB)

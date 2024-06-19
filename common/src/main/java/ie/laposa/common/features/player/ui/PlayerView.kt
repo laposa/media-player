@@ -1,9 +1,12 @@
 package ie.laposa.common.features.player.ui
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.view.KeyEvent
+import android.view.SurfaceView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -13,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.drawToBitmap
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -26,8 +30,10 @@ import androidx.media3.ui.PlayerView as ExoPlayerView
 @OptIn(UnstableApi::class)
 @Composable
 fun PlayerView(
+    fileName: String,
     url: String? = null,
     payload: InputStreamDataSourcePayload? = null,
+    saveThumbnail: ((fileName: String, bitmap: Bitmap, progress: Long) -> Unit)?
 ) {
     val context = LocalContext.current
 
@@ -43,10 +49,16 @@ fun PlayerView(
         payload
     }
 
+    var captureSurfaceView: SurfaceView = remember {
+        SurfaceView(context)
+    }
+
     LaunchedEffect(mediaItem) {
         mediaItem?.let {
             exoPlayer.setMediaItem(it)
+            exoPlayer.setVideoSurfaceView(captureSurfaceView)
             exoPlayer.prepare()
+            exoPlayer.play()
         }
     }
 
@@ -59,47 +71,64 @@ fun PlayerView(
 
             exoPlayer.setMediaSource(mediaSource)
             exoPlayer.addAnalyticsListener(EventLogger())
+
+            exoPlayer.setVideoSurfaceView(captureSurfaceView)
             exoPlayer.prepare()
+            exoPlayer.play()
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
+            println("TADY 1")
+            saveThumbnail?.let {
+                println("TADY 2: $captureSurfaceView")
+                captureSurfaceView.drawToBitmap().let {
+                    println("TADY 3")
+                    it(fileName, it, exoPlayer.currentPosition)
+                }
+            }
             exoPlayer.release()
         }
     }
 
-    AndroidView(
-        factory = { ctx ->
-            ExoPlayerView(ctx).apply {
-                player = exoPlayer
-            }
-        },
-        modifier = Modifier.focusable()
-            .fillMaxWidth()
-            .onKeyEvent { keyEvent ->
-                when (keyEvent.nativeKeyEvent.keyCode) {
-                    KeyEvent.KEYCODE_DPAD_CENTER -> {
-                        when {
-                            exoPlayer.isPlaying -> {
-                                exoPlayer.pause()
-                            }
+    Box {
+        AndroidView(factory = { ctx -> captureSurfaceView })
+        AndroidView(
+            factory = { ctx ->
+                ExoPlayerView(ctx).apply {
+                    player = exoPlayer
+                }
+            },
+            modifier = Modifier
+                .focusable()
+                .fillMaxWidth()
+                .onKeyEvent { keyEvent ->
+                    when (keyEvent.nativeKeyEvent.keyCode) {
+                        KeyEvent.KEYCODE_DPAD_CENTER -> {
+                            when {
+                                exoPlayer.isPlaying -> {
+                                    exoPlayer.pause()
+                                }
 
-                            exoPlayer.isPlaying.not() -> {
-                                exoPlayer.playWhenReady = true
-                            }
+                                exoPlayer.isPlaying.not() -> {
+                                    exoPlayer.playWhenReady = true
+                                }
 
-                            else -> {
-                                exoPlayer.play()
+                                else -> {
+                                    exoPlayer.play()
+                                }
                             }
+                            true
                         }
-                        true
-                    }
 
-                    else -> {
-                        false
+                        else -> {
+                            false
+                        }
                     }
                 }
-            }
-    )
+        )
+
+    }
+
 }

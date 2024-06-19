@@ -5,6 +5,8 @@ import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import ie.laposa.domain.mediaSource.model.MediaSourceFile
+import ie.laposa.domain.recents.RecentMedia
+import ie.laposa.domain.recents.RecentMediaCollection
 import ie.laposa.domain.rememberLogin.RememberLogin
 
 class SavedStateService(
@@ -51,8 +53,27 @@ class SavedStateService(
         savedStateHandle[key] = null
     }
 
+    fun addRecentMedia(recentMediaCollection: RecentMediaCollection) {
+        sharedPreferences.edit(true) {
+            putString(KEY_RECENT_MEDIA, recentMediaCollection.toJSON())
+        }
+    }
+
+    fun getRecentMedia(): RecentMediaCollection? {
+        return sharedPreferences.getString(KEY_RECENT_MEDIA, null)?.let {
+            RecentMediaCollection.fromJSON(it)
+        }
+    }
+
+    fun clearRecentMedia() {
+        sharedPreferences.edit(true) {
+            remove(KEY_RECENT_MEDIA)
+        }
+    }
+
     companion object {
         private const val KEY_SELECTED_MEDIA = "selectedMedia"
         private const val KEY_SELECTED_INPUT_STREAM_DATA_SOURCE = "selectedInputStreamDataSource"
+        private const val KEY_RECENT_MEDIA = "recentMedia"
     }
 }

@@ -13,6 +13,7 @@ import ie.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
 import ie.laposa.domain.mediaSource.model.samba.SambaMediaProvider
 import ie.laposa.domain.networkProtocols.nfs.NfsService
 import ie.laposa.domain.networkProtocols.smb.SmbService
+import ie.laposa.domain.recents.RecentMediaService
 import ie.laposa.domain.rememberLogin.RememberLoginService
 import ie.laposa.domain.savedState.SavedStateService
 import ie.laposa.domain.zeroConf.ZeroConfService
@@ -93,5 +94,13 @@ object DomainModule {
         nfsMediaProvider: NfsMediaProvider,
     ): MediaSourceService {
         return MediaSourceService(zeroConfService, smMediaProvider, nfsMediaProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRecentMediaService(
+        savedStateService: SavedStateService,
+    ): RecentMediaService {
+        return RecentMediaService(savedStateService)
     }
 }
