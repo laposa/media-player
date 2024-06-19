@@ -127,6 +127,7 @@ fun Menu() {
                 Spacer(modifier = Modifier.weight(1f))
                 NavigationDrawerItem(selected = selectedIndex == menuStructure.size, onClick = {
                     selectedIndex = menuStructure.size
+                    homeNavigation.navigateToSettings()
                 }, leadingContent = {
                     Icon(
                         Icons.Outlined.Settings,

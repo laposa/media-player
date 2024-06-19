@@ -31,8 +31,8 @@ class HomeNavigation(
         it.destination.route
     }
 
-    private fun navigateTo(route: String) {
-        homeNavController.navigate(route)
+    private fun navigateTo(screen: Screen) {
+        homeNavController.navigate(screen.route)
     }
 
     fun navigateToPlayer(fileToPlay: MediaSourceFile?, filePath: String?) {
@@ -41,10 +41,14 @@ class HomeNavigation(
     }
 
     fun navigateToHome() {
-        navigateTo(Screen.DashBoard.route)
+        navigateTo(Screen.DashBoard)
     }
 
     fun navigateToZeroConf() {
-        navigateTo(Screen.ZeroConf.route)
+        navigateTo(Screen.ZeroConf)
+    }
+
+    fun navigateToSettings() {
+        navigateTo(Screen.Settings)
     }
 }

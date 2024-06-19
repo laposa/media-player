@@ -34,10 +34,14 @@ class SambaMediaProvider(
     }
 
     override suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> {
-        return if (path == "" && currentShare != null) {
+        return if (path == "") {
             smbService.getCurrentShares()
         } else {
-            smbService.getContentOfDirectoryAtPath(path)
+            smbService.getContentOfDirectoryAtPath(getPathWithoutShareName(path))
         }
+    }
+
+    private fun getPathWithoutShareName(path: String): String {
+        return currentShare?.let { path.removePrefix(it) } ?: path
     }
 }

@@ -49,9 +49,7 @@ class MediaSourceService(
         return pathOneLevelUpSplit.joinToString("/")
     }
 
-    private fun getPathWithoutShareName(path: String): String {
-        return path.removePrefix(_currentShareName)
-    }
+
 
     suspend fun goBack(): Pair<String, List<MediaSourceFileBase>> {
         updateCurrentPath(getOneLevelUpFromCurrentPath(), true)
@@ -61,7 +59,7 @@ class MediaSourceService(
     suspend fun getContentOfDirectoryAthPath(path: String): Pair<String, List<MediaSourceFileBase>> {
         updateCurrentPath(path)
         return _currentPath.value to (_currentMediaProvider?.getContentOfDirectoryAtPath(
-            getPathWithoutShareName(_currentPath.value)
+            _currentPath.value
         )
             ?: emptyList())
     }

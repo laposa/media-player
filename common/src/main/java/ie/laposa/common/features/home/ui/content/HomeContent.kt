@@ -11,6 +11,7 @@ import ie.laposa.common.features.home.ui.HomeScreenViewModel
 import ie.laposa.common.features.home.ui.LocalHomeNavigation
 import ie.laposa.common.features.home.ui.ProvideHomeNavController
 import ie.laposa.common.features.player.ui.PlayerScreen
+import ie.laposa.common.features.settings.ui.SettingsScreen
 import ie.laposa.common.features.zeroConf.ZeroConfContent
 import ie.laposa.common.ui.Screen
 
@@ -40,6 +41,10 @@ fun HomeContent(
 
         composable(Screen.Player.route) {
             PlayerScreen({})
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen()
         }
     }
 }

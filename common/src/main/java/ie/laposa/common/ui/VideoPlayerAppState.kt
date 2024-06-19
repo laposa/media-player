@@ -47,4 +47,8 @@ sealed interface Screen {
     data object ZeroConf : Screen {
         override val route: String = "/zeroconf"
     }
+
+    data object Settings : Screen {
+        override val route: String = "/setting"
+    }
 }
