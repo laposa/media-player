@@ -34,6 +34,7 @@ fun SampleMediaScreen(
             "Samples",
             viewModel.media,
             "",
+            1,
             ::onMediaSelected,
             ::onDirectorySelected,
             ::onShareSelected,

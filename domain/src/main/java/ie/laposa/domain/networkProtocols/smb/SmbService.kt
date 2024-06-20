@@ -83,7 +83,10 @@ class SmbService {
 
             return@withContext true
         } catch (e: Exception) {
-            e.printStackTrace()
+            if (e.message?.contains("STATUS_LOGON_FAILURE") == true && userName != null) {
+                throw WrongCredentialsException()
+            }
+
             return@withContext false
         }
     }

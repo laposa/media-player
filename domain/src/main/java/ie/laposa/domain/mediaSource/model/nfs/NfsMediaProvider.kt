@@ -32,7 +32,7 @@ class NfsMediaProvider(
         password: String?,
         remember: Boolean,
     ): Boolean {
-        nfsService.connect(mediaSource)
+        //nfsService.connect(mediaSource)
         return true
     }
 

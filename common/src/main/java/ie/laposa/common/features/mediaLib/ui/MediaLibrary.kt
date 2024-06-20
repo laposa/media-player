@@ -1,9 +1,11 @@
 package ie.laposa.common.features.mediaLib.ui
 
+import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -34,6 +36,7 @@ fun MediaLibrary(
     title: String,
     files: StateFlow<List<MediaSourceFileBase>>,
     path: String,
+    defaultPathDepthLevel: Int = 1,
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
@@ -45,6 +48,30 @@ fun MediaLibrary(
         title,
         currentFiles,
         path,
+        defaultPathDepthLevel,
+        onMediaFileSelect,
+        onMediaDirectorySelect,
+        onMediaShareSelect,
+        onGoUp
+    )
+}
+
+@Composable
+fun MediaLibrary(
+    title: String,
+    files: List<MediaSourceFileBase>,
+    path: String,
+    defaultPathDepthLevel: Int = 1,
+    onMediaFileSelect: (MediaSourceFile) -> Unit,
+    onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
+    onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onGoUp: () -> Unit,
+) {
+    MediaLibraryInner(
+        title,
+        files,
+        path,
+        defaultPathDepthLevel,
         onMediaFileSelect,
         onMediaDirectorySelect,
         onMediaShareSelect,
@@ -57,6 +84,7 @@ private fun MediaLibraryInner(
     title: String,
     files: List<MediaSourceFileBase>,
     path: String,
+    defaultPathDepthLevel: Int = 1,
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
@@ -67,7 +95,7 @@ private fun MediaLibraryInner(
             return path.split("/").size
         }
 
-        if (getPathDepthLevel() >= 1 && path.isNotEmpty()) {
+        if (getPathDepthLevel() >= defaultPathDepthLevel && path.isNotEmpty()) {
             return listOf(MediaSourceGoUp()) + files
         }
 
@@ -82,6 +110,7 @@ private fun MediaLibraryInner(
         Text(getCurrentTitle(), style = MaterialTheme.typography.titleLarge, color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
             columns = GridCells.Adaptive(128.dp),
             contentPadding = PaddingValues(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

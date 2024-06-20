@@ -37,6 +37,8 @@ data class MediaSource(
 sealed class MediaSourceType : Parcelable {
     data object Url : MediaSourceType()
 
+    data object LocalFile : MediaSourceType()
+
     @Parcelize
     sealed class ZeroConf(val type: ZeroConfServiceType) : MediaSourceType() {
         data object SMB : ZeroConf(ZeroConfServiceType.SMB)

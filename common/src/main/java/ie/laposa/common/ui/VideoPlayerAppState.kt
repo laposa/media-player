@@ -51,4 +51,8 @@ sealed interface Screen {
     data object Settings : Screen {
         override val route: String = "/setting"
     }
+
+    data object LocalStorage : Screen {
+        override val route: String = "/localStorage"
+    }
 }

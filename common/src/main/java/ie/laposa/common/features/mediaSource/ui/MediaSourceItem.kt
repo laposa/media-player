@@ -86,8 +86,9 @@ fun MediaSourceItem(
                 if (viewModel.isLoginDialogVisible.collectAsState().value) {
                     val error = viewModel.loginDialogError.collectAsState().value
                     MediaSourceLoginDialog(
+                        selected.displayName,
                         error,
-                        {},
+                        { viewModel.hideLoginDialog() },
                     ) { userName, password, remember ->
                         viewModel.onLoginSubmit(userName, password, remember)
                     }

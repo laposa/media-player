@@ -42,7 +42,7 @@ fun MediaItem(
 ) {
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(media) {
         if (index == 0) {
             focusRequester.requestFocus()
         }
@@ -63,7 +63,7 @@ fun MediaItem(
                             GlideImage(
                                 model = media.thumbnailUrl,
                                 contentDescription = media.name,
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.None,
                             )
                         } else {
                             Icon(

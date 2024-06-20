@@ -74,6 +74,12 @@ fun Menu() {
                 homeNavigation.navigateToZeroConf()
             },
         ),
+        MenuSection(
+            title = "Local Storage", iconResource = R.drawable.ic_storage,
+            onClick = {
+                homeNavigation.navigateToLocalStorage()
+            },
+        ),
     )
 
     LaunchedEffect(true) {

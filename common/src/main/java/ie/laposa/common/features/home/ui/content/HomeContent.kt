@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import ie.laposa.common.features.home.ui.HomeScreenViewModel
 import ie.laposa.common.features.home.ui.LocalHomeNavigation
 import ie.laposa.common.features.home.ui.ProvideHomeNavController
+import ie.laposa.common.features.localStorage.ui.LocalStorageContent
 import ie.laposa.common.features.player.ui.PlayerScreen
 import ie.laposa.common.features.settings.ui.SettingsScreen
 import ie.laposa.common.features.zeroConf.ZeroConfContent
@@ -45,6 +46,10 @@ fun HomeContent(
 
         composable(Screen.Settings.route) {
             SettingsScreen()
+        }
+
+        composable(Screen.LocalStorage.route) {
+            LocalStorageContent()
         }
     }
 }

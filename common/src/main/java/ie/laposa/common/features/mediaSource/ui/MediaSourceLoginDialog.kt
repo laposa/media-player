@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.tv.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,13 +34,14 @@ import ie.laposa.common.ui.theme.ComponentsTheme
 
 @Composable
 fun MediaSourceLoginDialog(
+    mediaSourceName: String,
     error: String?,
     onDismiss: () -> Unit,
     onSubmit: (String?, String?, Boolean) -> Unit,
 ) {
     var userName by remember { mutableStateOf<String?>("frenkybojler") }
     var password by remember { mutableStateOf<String?>("F98zi6o6") }
-    var remember by remember {
+    val remember by remember {
         mutableStateOf(true)
     }
 
@@ -63,7 +64,7 @@ fun MediaSourceLoginDialog(
                         .background(Color.Transparent)
                 ) {
                     Text(
-                        "Login to media source",
+                        "Login to $mediaSourceName",
                         color = Color.White,
                         style = MaterialTheme.typography.labelLarge
                     )

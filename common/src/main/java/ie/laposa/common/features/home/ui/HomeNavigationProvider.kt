@@ -51,4 +51,8 @@ class HomeNavigation(
     fun navigateToSettings() {
         navigateTo(Screen.Settings)
     }
+
+    fun navigateToLocalStorage() {
+        navigateTo(Screen.LocalStorage)
+    }
 }
