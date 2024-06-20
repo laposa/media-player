@@ -84,11 +84,11 @@ fun PlayerView(
     }
 
     if (shouldDismiss) {
-        saveThumbnail?.let {
+        /*saveThumbnail?.let {
             captureSurfaceView.drawToBitmap().let {
                 it(fileName, it, exoPlayer.currentPosition)
             }
-        }
+        }*/
         dismiss()
     }
 
