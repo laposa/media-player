@@ -12,14 +12,6 @@ class VideoPlayerAppState(
     val currentRoute = navHostController.currentBackStackEntryFlow.map {
         it.destination.route
     }
-
-    private fun navigateTo(route: String) {
-        navHostController.navigate(route)
-    }
-
-    fun navigateToPlayer() {
-        navigateTo(Screen.Player.route)
-    }
 }
 
 @Composable

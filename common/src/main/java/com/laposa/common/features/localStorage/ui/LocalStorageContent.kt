@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.laposa.common.features.common.permissionDeniedScreen.PermissionDeniedScreen
+import com.laposa.common.features.common.screens.PermissionDeniedScreen
 import com.laposa.common.features.home.ui.LocalHomeNavigation
 
 @Composable

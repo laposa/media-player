@@ -1,4 +1,4 @@
-package com.laposa.common.features.common.notImplementedScreen
+package com.laposa.common.features.common.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
