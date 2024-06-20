@@ -35,7 +35,7 @@ fun Header() {
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            "Laposa Player",
+            "LAPOSA PLAYER",
             color = Color.White,
             style = VideoPlayerTypography.headlineSmall.copy(
                 fontSize = TextUnit(
