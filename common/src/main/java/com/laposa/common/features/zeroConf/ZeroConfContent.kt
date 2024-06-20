@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.laposa.common.features.common.screens.EmptyListScreen
 import com.laposa.common.features.home.ui.LocalHomeNavigation
 import com.laposa.common.features.mediaSource.ui.LocalMediaSourceItemViewModelFactory
 import com.laposa.common.features.mediaSource.ui.MediaSourceItem
@@ -40,7 +41,7 @@ fun ZeroConfContent(
 
     if (content != null) {
         content!!()
-    } else {
+    } else if (mediaSources.isNotEmpty()) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(128.dp),
             contentPadding = PaddingValues(top = 8.dp),
@@ -60,5 +61,7 @@ fun ZeroConfContent(
                 )
             }
         }
+    } else {
+        EmptyListScreen()
     }
 }

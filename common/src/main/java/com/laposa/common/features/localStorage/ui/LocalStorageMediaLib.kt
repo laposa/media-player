@@ -1,27 +1,13 @@
 package com.laposa.common.features.localStorage.ui
 
-import android.net.Uri
 import android.os.Environment
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentCompositionErrors
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
+import com.laposa.common.features.common.screens.EmptyListScreen
 import com.laposa.common.features.mediaLib.ui.MediaLibrary
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
@@ -55,17 +41,20 @@ fun LocalStorageMediaLib(
         currentPath = File(currentPath).parent ?: rootPath
     }
 
-
-    MediaLibrary(
-        title = "Local Storage",
-        files = currentFiles.keys.toList(),
-        path = currentPath,
-        defaultPathDepthLevel = rootPath.split("/").size + 1,
-        onMediaFileSelect = ::onFileSelect,
-        onMediaDirectorySelect = ::onDirectorySelect,
-        onMediaShareSelect = ::onShareSelect,
-        onGoUp = ::onGoUp
-    )
+    if (currentFiles.keys.isNotEmpty()) {
+        MediaLibrary(
+            title = "Local Storage",
+            files = currentFiles.keys.toList(),
+            path = currentPath,
+            defaultPathDepthLevel = rootPath.split("/").size + 1,
+            onMediaFileSelect = ::onFileSelect,
+            onMediaDirectorySelect = ::onDirectorySelect,
+            onMediaShareSelect = ::onShareSelect,
+            onGoUp = ::onGoUp
+        )
+    } else {
+        EmptyListScreen()
+    }
 }
 
 fun getFilesAndFolders(path: String): Map<MediaSourceFileBase, File> {
