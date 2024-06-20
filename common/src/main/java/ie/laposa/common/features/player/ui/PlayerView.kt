@@ -24,6 +24,9 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.extractor.DefaultExtractorsFactory
 import ie.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import androidx.media3.ui.PlayerView as ExoPlayerView
 
 
@@ -31,9 +34,11 @@ import androidx.media3.ui.PlayerView as ExoPlayerView
 @Composable
 fun PlayerView(
     fileName: String,
+    shouldDismiss: Boolean,
+    dismiss: () -> Unit,
     url: String? = null,
     payload: InputStreamDataSourcePayload? = null,
-    saveThumbnail: ((fileName: String, bitmap: Bitmap, progress: Long) -> Unit)?
+    saveThumbnail: ((fileName: String, bitmap: Bitmap, progress: Long) -> Unit)?,
 ) {
     val context = LocalContext.current
 
@@ -49,7 +54,7 @@ fun PlayerView(
         payload
     }
 
-    var captureSurfaceView: SurfaceView = remember {
+    val captureSurfaceView: SurfaceView = remember {
         SurfaceView(context)
     }
 
@@ -78,16 +83,17 @@ fun PlayerView(
         }
     }
 
+    if (shouldDismiss) {
+        saveThumbnail?.let {
+            captureSurfaceView.drawToBitmap().let {
+                it(fileName, it, exoPlayer.currentPosition)
+            }
+        }
+        dismiss()
+    }
+
     DisposableEffect(Unit) {
         onDispose {
-            println("TADY 1")
-            saveThumbnail?.let {
-                println("TADY 2: $captureSurfaceView")
-                captureSurfaceView.drawToBitmap().let {
-                    println("TADY 3")
-                    it(fileName, it, exoPlayer.currentPosition)
-                }
-            }
             exoPlayer.release()
         }
     }

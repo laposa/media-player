@@ -10,8 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
@@ -42,6 +47,10 @@ fun PlayerScreen(
 
     val context = LocalContext.current
 
+    var shouldDismiss by remember {
+        mutableStateOf(false)
+    }
+
     viewModel.selectedMedia.observeForever {
         println("selectedMedia changed to $it")
     }
@@ -61,7 +70,7 @@ fun PlayerScreen(
     }
 
     Dialog(
-        onDismissRequest = hidePlayerScreen,
+        onDismissRequest = { shouldDismiss = true },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
@@ -71,9 +80,21 @@ fun PlayerScreen(
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
             selectedMedia?.let {
-                PlayerView(fileName = fileName, url = it.path, saveThumbnail = ::saveThumbnail)
+                PlayerView(
+                    fileName = fileName,
+                    url = it.path,
+                    shouldDismiss = shouldDismiss,
+                    dismiss = hidePlayerScreen,
+                    saveThumbnail = ::saveThumbnail
+                )
             } ?: selectedInputStreamDataSourcePayload?.let {
-                PlayerView(fileName = fileName, payload = it, saveThumbnail = ::saveThumbnail)
+                PlayerView(
+                    fileName = fileName,
+                    payload = it,
+                    shouldDismiss = shouldDismiss,
+                    dismiss = hidePlayerScreen,
+                    saveThumbnail = ::saveThumbnail
+                )
             } ?: run {
                 Column {
                     Text("No media selected", style = VideoPlayerTypography.titleSmall)

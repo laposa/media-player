@@ -22,7 +22,6 @@ class RecentMediaService(
     fun addRecentMedia(recent: RecentMedia) {
         _recentMediaCollection.value.add(recent)
         savedStateService.addRecentMedia(RecentMediaCollection(_recentMediaCollection.value.getAll()))
-        println("Recent media: ${_recentMediaCollection.value.getAll()}")
     }
 
     private fun getSavedRecentMedia(): RecentMediaCollection? {
