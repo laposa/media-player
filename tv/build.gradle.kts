@@ -4,14 +4,15 @@ plugins {
     alias(libs.plugins.hilt.android.gradle.plugin)
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "ie.laposa.video_player_android"
+    namespace = "com.laposa.mediaplayer"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ie.laposa.video_player_android"
+        applicationId = "com.laposa.mediaplayer"
         minSdk = 23
         targetSdk = 34
         versionCode = 1
@@ -84,6 +85,8 @@ dependencies {
     implementation(libs.javapoet)
     implementation(libs.glide)
     implementation(libs.androidx.compose.runtime.livedata)
+
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
 
     implementation(project(":common"))
     implementation(project(":domain"))

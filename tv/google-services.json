@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1044748354155",
+    "project_id": "laposa-media-player",
+    "storage_bucket": "laposa-media-player.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044748354155:android:2fcc88c1675fe8597da72e",
+        "android_client_info": {
+          "package_name": "com.laposa.mediaplayer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaRchVCum1-baAoYhiixJBEh_hbq9PLw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

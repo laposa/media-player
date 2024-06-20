@@ -1,4 +1,4 @@
-package ie.laposa.domain
+package com.laposa.domain
 
 import org.junit.Test
 
