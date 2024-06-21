@@ -57,7 +57,9 @@ fun PlayerScreen(
 
     fun saveThumbnail(fileName: String, bitmap: Bitmap, progress: Long) {
         viewModel.launch {
+            println("TADY: $fileName")
             saveBitmapToTempFile(fileName, context, bitmap)?.let {
+                println("TADY 2: $it")
                 viewModel.saveLastPlayedMediaToRecents(it, progress)
             }
         }
@@ -108,7 +110,9 @@ suspend fun saveBitmapToTempFile(fileName: String, context: Context, bitmap: Bit
     withContext(Dispatchers.IO) {
         try {
             // Create a temporary file
-            val tempFile = File.createTempFile(fileName, ".png", context.cacheDir)
+            val strippedFileName = fileName.replace(Regex("[^a-zA-Z0-9.-]"), "_")
+            println(strippedFileName)
+            val tempFile = File.createTempFile(strippedFileName, ".png", context.cacheDir)
 
             // Write the bitmap to the file
             val outputStream = FileOutputStream(tempFile)

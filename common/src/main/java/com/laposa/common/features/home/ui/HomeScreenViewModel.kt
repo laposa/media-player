@@ -20,6 +20,7 @@ class HomeScreenViewModel @Inject constructor(
     val isPlayerVisible: StateFlow<Boolean> = _isPlayerVisible
 
     fun showPlayer(fileToPlay: MediaSourceFile?, filePath: String?) {
+        println("Show player: $fileToPlay - $filePath")
         fileToPlay?.let {
             savedStateService.setSelectedMedia(fileToPlay)
         }

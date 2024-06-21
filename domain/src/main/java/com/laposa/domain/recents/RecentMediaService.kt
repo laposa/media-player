@@ -4,24 +4,27 @@ import com.laposa.domain.savedState.SavedStateService
 import com.laposa.domain.utils.MyQueue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.transform
 
 class RecentMediaService(
     private val savedStateService: SavedStateService
 ) {
-    private val _recentMediaCollection = MutableStateFlow(
-        MyQueue.fromList(
-            (savedStateService.getRecentMedia() ?: RecentMediaCollection.empty()).items,
-            MAXIMUM_COUNT_OF_RECENT_MEDIA
-        )
+    private var _recentMediaQueue: MyQueue<RecentMedia> = MyQueue.fromList(
+        getSavedRecentMedia()?.items ?: emptyList(),
+        MAXIMUM_COUNT_OF_RECENT_MEDIA
     )
 
-    val recentMediaCollection: Flow<List<RecentMedia>> =
-        _recentMediaCollection.transform { it.getAll() }
+    private val _recentMediaCollection: MutableStateFlow<List<RecentMedia>> = MutableStateFlow(
+        _recentMediaQueue.getAll()
+    )
+
+    val recentMediaCollection: StateFlow<List<RecentMedia>> = _recentMediaCollection
 
     fun addRecentMedia(recent: RecentMedia) {
-        _recentMediaCollection.value.add(recent)
-        savedStateService.addRecentMedia(RecentMediaCollection(_recentMediaCollection.value.getAll()))
+        _recentMediaQueue.add(recent)
+        _recentMediaCollection.value = _recentMediaQueue.getAll()
+        savedStateService.addRecentMedia(RecentMediaCollection(_recentMediaCollection.value))
     }
 
     private fun getSavedRecentMedia(): RecentMediaCollection? {

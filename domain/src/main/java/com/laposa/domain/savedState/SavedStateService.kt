@@ -14,14 +14,20 @@ class SavedStateService(
     private val sharedPreferences: SharedPreferences,
 ) {
     fun setSelectedMedia(media: MediaSourceFile) {
+        println("Set selected media: $media")
         savedStateHandle[KEY_SELECTED_MEDIA] = media
     }
 
-    fun getSelectedMedia(): LiveData<MediaSourceFile?> {
+    fun getSelectedMediaLiveData(): LiveData<MediaSourceFile?> {
         return savedStateHandle.getLiveData(KEY_SELECTED_MEDIA)
     }
 
+    fun getSelectedMedia(): MediaSourceFile? {
+        return savedStateHandle[KEY_SELECTED_MEDIA]
+    }
+
     fun clearSelectedMedia() {
+        println("Clear selected media")
         savedStateHandle[KEY_SELECTED_MEDIA] = null
     }
 

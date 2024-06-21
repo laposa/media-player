@@ -76,7 +76,7 @@ class MediaSourceItemViewModel(
         launch(handleError = false) {
             try {
                 when (selectedMediaSource.type) {
-                    is MediaSourceType.ZeroConf.SMB -> {
+                    MediaSourceType.ZERO_CONF_SMB -> {
                         connectToMediaSourceInternal(
                             selectedMediaSource, userName, password, remember
                         )
@@ -111,7 +111,7 @@ class MediaSourceItemViewModel(
         remember: Boolean,
     ) {
         when (mediaSource.type) {
-            is MediaSourceType.ZeroConf.SMB -> {
+            MediaSourceType.ZERO_CONF_SMB -> {
                 mediaSourceService.connectToMediaSource(mediaSource, userName, password, remember)
             }
 

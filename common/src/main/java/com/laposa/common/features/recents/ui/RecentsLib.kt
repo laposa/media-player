@@ -46,6 +46,8 @@ fun RecentsLib(
 
     if (recentMedia.isEmpty()) return
 
+    println("Recent media items: $recentMedia")
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(128.dp),
         contentPadding = PaddingValues(top = 8.dp),
@@ -63,10 +65,10 @@ fun RecentsLib(
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     media.thumbnailPath?.let { imagePath ->
                         loadBitmapFromStorage(filePath = imagePath)?.let {
+                            println("Image from storage: $it")
                             Image(
                                 bitmap = it.asImageBitmap(),
                                 contentDescription = null,
-                                modifier = Modifier.size(300.dp)
                             )
                         }
                     } ?: Icon(
@@ -89,9 +91,6 @@ fun RecentsLib(
     }
 }
 
-@Composable
 fun loadBitmapFromStorage(filePath: String): Bitmap? {
-    return remember(filePath) {
-        BitmapFactory.decodeFile(filePath)
-    }
+       return BitmapFactory.decodeFile(filePath)
 }

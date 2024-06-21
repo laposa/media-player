@@ -19,7 +19,7 @@ class PlayerScreenViewModel @Inject constructor(
     mediaSourceService: MediaSourceService,
     private val recentMediaService: RecentMediaService,
 ) : ViewModelBase() {
-    val selectedMedia: LiveData<MediaSourceFile?> = savedStateService.getSelectedMedia()
+    val selectedMedia: LiveData<MediaSourceFile?> = savedStateService.getSelectedMediaLiveData()
 
     private val _selectedInputStreamDataSourceFile =
         savedStateService.getSelectedInputStreamDataSourceFileName()
@@ -50,8 +50,12 @@ class PlayerScreenViewModel @Inject constructor(
     }
 
     fun saveLastPlayedMediaToRecents(thumbnailFilePath: String, progress: Long) {
-        selectedMedia.value?.let { media ->
+        println("TADY 3: $thumbnailFilePath")
+        println("TADY 3: ${savedStateService.getSelectedMedia()}")
+        savedStateService.getSelectedMedia()?.let { media ->
+            println("TADY 4: $media")
             media.type?.let { type ->
+                println("TADY 5: $type")
                 recentMediaService.addRecentMedia(
                     RecentMedia(
                         mediaSourceType = type,

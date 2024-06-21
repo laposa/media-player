@@ -1,9 +1,12 @@
 package com.laposa.common.features.player.ui
 
 import android.graphics.Bitmap
+import android.graphics.SurfaceTexture
 import android.net.Uri
 import android.view.KeyEvent
+import android.view.Surface
 import android.view.SurfaceView
+import android.view.TextureView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -58,10 +61,59 @@ fun PlayerView(
         SurfaceView(context)
     }
 
-    LaunchedEffect(mediaItem) {
+    val textureView: TextureView = remember {
+        TextureView(context).apply {
+            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                override fun onSurfaceTextureAvailable(
+                    surface: SurfaceTexture,
+                    width: Int,
+                    height: Int
+                ) {
+                    println("TADY JSEM VOLE")
+                    mediaItem?.let {
+                        exoPlayer.setMediaItem(it)
+                        exoPlayer.setVideoSurface(Surface(surface))
+                        exoPlayer.prepare()
+                        exoPlayer.play()
+                    }
+
+                    inputStreamDataSourceRemembered?.let {
+                        val dataSourceFactory = InputStreamDataSourceFactory(it, context)
+                        val mediaSource =
+                            ProgressiveMediaSource.Factory(
+                                dataSourceFactory,
+                                DefaultExtractorsFactory()
+                            )
+                                .createMediaSource(MediaItem.fromUri(Uri.EMPTY))
+
+                        exoPlayer.setMediaSource(mediaSource)
+                        exoPlayer.addAnalyticsListener(EventLogger())
+
+                        exoPlayer.setVideoSurface(Surface(surface))
+                        exoPlayer.prepare()
+                        exoPlayer.play()
+                    }
+                }
+
+
+                override fun onSurfaceTextureSizeChanged(
+                    surface: SurfaceTexture,
+                    width: Int,
+                    height: Int
+                ) = Unit
+
+                override fun onSurfaceTextureUpdated(surface: SurfaceTexture) = Unit
+                override fun onSurfaceTextureDestroyed(surface: SurfaceTexture) = true
+
+            }
+        }
+    }
+
+
+    /*LaunchedEffect(mediaItem) {
         mediaItem?.let {
             exoPlayer.setMediaItem(it)
-            exoPlayer.setVideoSurfaceView(captureSurfaceView)
+            exoPlayer.setVideoTextureView(textureView)
             exoPlayer.prepare()
             exoPlayer.play()
         }
@@ -75,21 +127,22 @@ fun PlayerView(
                     .createMediaSource(MediaItem.fromUri(Uri.EMPTY))
 
             exoPlayer.setMediaSource(mediaSource)
+            exoPlayer.setVideoTextureView(textureView)
             exoPlayer.addAnalyticsListener(EventLogger())
 
-            exoPlayer.setVideoSurfaceView(captureSurfaceView)
             exoPlayer.prepare()
             exoPlayer.play()
         }
-    }
+    }*/
 
     if (shouldDismiss) {
-        /*saveThumbnail?.let {
-            captureSurfaceView.drawToBitmap().let {
+        saveThumbnail?.let {
+            textureView.bitmap?.let {
                 it(fileName, it, exoPlayer.currentPosition)
             }
-        }*/
-        dismiss()
+        }
+
+        println("Thumbnail save finished")
     }
 
     DisposableEffect(Unit) {
@@ -99,7 +152,7 @@ fun PlayerView(
     }
 
     Box {
-        AndroidView(factory = { ctx -> captureSurfaceView })
+        AndroidView(factory = { ctx -> textureView })
         AndroidView(
             factory = { ctx ->
                 ExoPlayerView(ctx).apply {

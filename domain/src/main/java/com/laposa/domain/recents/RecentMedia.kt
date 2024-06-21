@@ -14,7 +14,10 @@ data class RecentMediaCollection(
     companion object {
         fun fromJSON(json: String): RecentMediaCollection {
             return RecentMediaCollection(
-                items = json.split(";").map { RecentMedia.fromJSON(it) }
+                items = json.split(";").map {
+                    println("TADY 7: $it")
+                    RecentMedia.fromJSON(it)
+                }
             )
         }
 

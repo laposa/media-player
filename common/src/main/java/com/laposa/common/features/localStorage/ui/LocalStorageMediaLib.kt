@@ -70,7 +70,7 @@ fun getFilesAndFolders(path: String): Map<MediaSourceFileBase, File> {
             MediaSourceFile(
                 name = it.name,
                 path = it.absolutePath,
-                type = MediaSourceType.LocalFile
+                type = MediaSourceType.LOCAL_FILE
             ) to it
         }
     }.toMap()
