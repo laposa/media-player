@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -87,6 +88,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime.livedata)
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
 
     implementation(project(":common"))
     implementation(project(":domain"))
