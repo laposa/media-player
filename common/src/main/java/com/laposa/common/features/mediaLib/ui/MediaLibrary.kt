@@ -1,6 +1,7 @@
 package com.laposa.common.features.mediaLib.ui
 
 import android.widget.Space
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -90,6 +91,11 @@ private fun MediaLibraryInner(
     onMediaShareSelect: (MediaSourceShare) -> Unit,
     onGoUp: () -> Unit,
 ) {
+
+    BackHandler(path.isNotEmpty()) {
+        onGoUp()
+    }
+
     fun getCurrentFiles(): List<MediaSourceFileBase> {
         fun getPathDepthLevel(): Int {
             return path.split("/").size
