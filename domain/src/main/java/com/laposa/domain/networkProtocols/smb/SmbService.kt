@@ -192,7 +192,7 @@ class SmbService {
     companion object {
         private const val TAG = "SmbService"
         private val videoFilesExtensions = listOf(
-            ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm", ".m4v"
+            ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm", ".m4v", ".mp3"
         )
     }
 }

@@ -86,12 +86,6 @@ class InputStreamDataSourceFactory @OptIn(UnstableApi::class) constructor(
     override fun createDataSource(): DataSource {
         val cache: SimpleCache = CacheUtil.getCache(context)
         val defaultDataSourceFactory = DataSource.Factory { InputStreamDataSource(payload) }
-
-        return CacheDataSource.Factory()
-            .setCache(cache)
-            .setUpstreamDataSourceFactory(defaultDataSourceFactory)
-            .setCacheWriteDataSinkFactory(CacheDataSink.Factory().setCache(cache))
-            .setFlags(CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-            .createDataSource()
+        return defaultDataSourceFactory.createDataSource()
     }
 }
