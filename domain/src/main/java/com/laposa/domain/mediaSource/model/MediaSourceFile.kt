@@ -1,6 +1,7 @@
 package com.laposa.domain.mediaSource.model
 
 import android.os.Parcelable
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 sealed class MediaSourceFileBase {
@@ -26,7 +27,15 @@ data class MediaSourceFile(
     override val path: String,
     val thumbnailUrl: String? = null,
     val type: MediaSourceType? = null,
-) : MediaSourceFileWithPath(), Parcelable
+) : MediaSourceFileWithPath(), Parcelable {
+    @IgnoredOnParcel
+    val fullPath: String = when {
+        path.isEmpty() -> name
+        path.last() == '/' && name.first() != '/' -> "$path$name"
+        path.last() != '/' && name.first() == '/' -> "$path$name"
+        else -> "$path/$name"
+    }
+}
 
 class MediaSourceDirectory(override val name: String, override val path: String) :
     MediaSourceFileWithPath()

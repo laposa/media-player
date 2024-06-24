@@ -101,13 +101,6 @@ fun MediaSourceItem(
         }
     }
 
-    /*MediaSource(
-        mediaSource,
-        ::onMediaSourceSelected,
-        isLoading,
-        key == selectedKey,
-    )*/
-
     Column {
         Card(
             onClick = { onMediaSourceSelected(mediaSource) },

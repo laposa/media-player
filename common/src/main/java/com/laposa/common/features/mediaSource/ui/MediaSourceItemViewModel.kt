@@ -34,7 +34,7 @@ class MediaSourceItemViewModel(
     fun openDirectory(directory: MediaSourceDirectory) {
         launch {
             val files =
-                mediaSourceService.getContentOfDirectoryAthPath("${directory.path}${directory.name}")
+                mediaSourceService.getContentOfDirectoryAthPath(directory.name)
             _files.value = files.second
         }
     }
@@ -97,9 +97,10 @@ class MediaSourceItemViewModel(
     suspend fun onFileSelected(
         sourceFile: MediaSourceFile, playFile: (MediaSourceFile?, String?) -> Unit
     ) {
-        mediaSourceService.getFile(sourceFile.name)?.let {
-            savedStateService.setSelectedInputStreamDataSourceFileName(sourceFile.name)
-            playFile(null, sourceFile.name)
+        val fileFullPath = sourceFile.fullPath
+        mediaSourceService.getFile(fileFullPath)?.let {
+            savedStateService.setSelectedInputStreamDataSourceFileName(fileFullPath)
+            playFile(null, fileFullPath)
         }
     }
 

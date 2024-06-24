@@ -24,9 +24,6 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.extractor.DefaultExtractorsFactory
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import androidx.media3.ui.PlayerView as ExoPlayerView
 
 
