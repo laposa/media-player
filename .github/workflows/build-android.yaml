@@ -2,6 +2,14 @@ name: Build and Upload APK to Artifacts
 
 on:
   workflow_dispatch:
+    inputs:
+        buildType:
+            description: 'Build Type'
+            required: true
+            default: 'release'
+            options:
+            - 'release'
+            - 'debug'
 
 jobs:
   build:
@@ -18,6 +26,11 @@ jobs:
           java-version: '17'
 
       - name: Build APK
+        if: ${{ github.event.inputs.buildType }} == 'debug'
+        run: ./gradlew assembleDebug
+
+      - name: Build APK
+        if: ${{ github.event.inputs.buildType }} == 'release'
         run: ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v4
