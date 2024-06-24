@@ -11,7 +11,6 @@ on:
             options:
             - 'release'
             - 'debug'
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,6 +34,13 @@ jobs:
         run: ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v4
+        if: github.event.inputs.buildType == 'release'
         with:
           name: tv-release
           path: tv/build/outputs/apk/release/tv-release.apk
+
+      - uses: actions/upload-artifact@v4
+        if: github.event.inputs.buildType == 'debug'
+        with:
+          name: tv-debug
+          path: tv/build/outputs/apk/debug/tv-debug.apk
