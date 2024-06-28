@@ -13,9 +13,6 @@ class SambaMediaProvider(
     private val smbService: SmbService,
     private val rememberLoginService: RememberLoginService,
 ) : MediaSourceProvider() {
-    override val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = smbService.filesList
-    val shares: StateFlow<Map<MediaSource, List<String>>?> = smbService.shares
-
     private var currentShare: String? = null
 
     override suspend fun connectToMediaSource(

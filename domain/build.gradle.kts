@@ -49,4 +49,5 @@ dependencies {
     implementation(libs.nfsClient)
     implementation(libs.vfs)
     implementation(libs.gson)
+    implementation(libs.jsch)
 }

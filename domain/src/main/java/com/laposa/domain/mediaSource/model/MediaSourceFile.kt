@@ -13,7 +13,7 @@ class MediaSourceShare(
 ) : MediaSourceFileBase()
 
 class MediaSourceGoUp(
-    override val name: String = "Go Back"
+    override val name: String = ""
 ) : MediaSourceFileBase()
 
 abstract class MediaSourceFileWithPath : MediaSourceFileBase() {

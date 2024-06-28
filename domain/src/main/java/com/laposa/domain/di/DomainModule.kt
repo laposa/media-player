@@ -12,6 +12,7 @@ import com.laposa.domain.mediaSource.MediaSourceService
 import com.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
 import com.laposa.domain.mediaSource.model.samba.SambaMediaProvider
 import com.laposa.domain.networkProtocols.nfs.NfsService
+import com.laposa.domain.networkProtocols.sftp.SFTPService
 import com.laposa.domain.networkProtocols.smb.SmbService
 import com.laposa.domain.recents.RecentMediaService
 import com.laposa.domain.rememberLogin.RememberLoginService
@@ -63,6 +64,12 @@ object DomainModule {
     @Provides
     fun provideSmbService(): SmbService {
         return SmbService()
+    }
+
+    @Singleton
+    @Provides
+    fun provideSFTPService(): SFTPService {
+        return SFTPService()
     }
 
     @Singleton

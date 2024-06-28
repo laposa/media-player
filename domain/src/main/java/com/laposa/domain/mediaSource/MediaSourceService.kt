@@ -1,5 +1,6 @@
 package com.laposa.domain.mediaSource
 
+import com.laposa.domain.mediaSource.model.ManualMediaSource
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
@@ -29,6 +30,12 @@ class MediaSourceService(
     val currentPath: StateFlow<String> = _currentPath
 
     private var _currentShareName = ""
+
+    suspend fun addAndConnectManualMediaSource(
+        manualMediaSource: ManualMediaSource,
+    ) {
+        //TODO: Implement
+    }
 
     private fun updateCurrentPath(newPath: String, fromGoBack: Boolean = false) {
         if (newPath != _currentPath.value && !fromGoBack) {
@@ -86,15 +93,17 @@ class MediaSourceService(
     ) {
         _currentMediaProvider = getMediaProvider(mediaSource)
 
-        when (mediaSource.type) {
-            is MediaSourceType.ZeroConf -> {
+        when {
+            mediaSource.type.isZeroConf -> {
                 connectToZeroConfMediaSource(
                     mediaSource,
                     userName,
                     password,
                     remember
                 )
-            } else -> {}
+            }
+
+            else -> {}
         }
     }
 
@@ -115,11 +124,11 @@ class MediaSourceService(
 
     private fun getMediaProvider(mediaSource: MediaSource): MediaSourceProvider? {
         return when (mediaSource.type) {
-            is MediaSourceType.ZeroConf.SMB -> {
+            MediaSourceType.ZERO_CONF_SMB -> {
                 _mediaProviders.find { it is SambaMediaProvider }
             }
 
-            is MediaSourceType.ZeroConf.NFS -> {
+            MediaSourceType.ZERO_CONF_NFS -> {
                 _mediaProviders.find { it is NfsMediaProvider }
             }
 

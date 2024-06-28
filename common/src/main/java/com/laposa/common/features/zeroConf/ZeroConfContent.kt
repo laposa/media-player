@@ -41,27 +41,28 @@ fun ZeroConfContent(
 
     if (content != null) {
         content!!()
-    } else if (mediaSources.isNotEmpty()) {
+    } else {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(128.dp),
             contentPadding = PaddingValues(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                ManualMediaSourceItem(::setContent, homeNavigation::navigateToZeroConf)
+            }
             itemsIndexed(mediaSources.sortedBy { it.type.toString() + it.displayName }) { index, source ->
                 MediaSourceItem(
                     mediaSource = source,
-                    setHomeContent = ::setContent,
+                    setScreenContent = ::setContent,
                     key = source.key,
                     selectedKey = null,
                     onSelected = {},
                     viewModelFactory = mediaSourceItemViewModelFactory,
-                    index = index,
+                    index = index + 1,
                     navigateToPlayer = homeNavigation::navigateToPlayer
                 )
             }
         }
-    } else {
-        EmptyListScreen()
     }
 }

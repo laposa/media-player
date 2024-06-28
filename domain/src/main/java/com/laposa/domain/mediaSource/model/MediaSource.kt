@@ -20,7 +20,7 @@ data class MediaSource(
     companion object {
         fun fromNSD(service: NsdServiceInfo): MediaSource {
             return MediaSource(
-                type = MediaSourceType.ZeroConf.fromId(service.serviceType),
+                type = MediaSourceType.fromId(service.serviceType),
                 displayName = service.serviceName,
                 sourceName = when {
                     ZeroConfServiceType.SMB.isType(service.serviceType) -> "SMB"
@@ -33,7 +33,38 @@ data class MediaSource(
     }
 }
 
-@Parcelize
+enum class MediaSourceType {
+    URL,
+    LOCAL_FILE,
+    ZERO_CONF_SMB,
+    ZERO_CONF_FTP,
+    ZERO_CONF_WEBDAV,
+    ZERO_CONF_NFS;
+
+    enum class ManualMediaSourceType {
+        SFTP,
+        SMB,
+    }
+
+    val isZeroConf: Boolean
+        get() = this == ZERO_CONF_SMB || this == ZERO_CONF_FTP || this == ZERO_CONF_WEBDAV || this == ZERO_CONF_NFS
+
+    companion object {
+        fun fromId(id: String): MediaSourceType {
+            return when (id) {
+                "URL" -> URL
+                "LOCAL_FILE" -> LOCAL_FILE
+                "._smb._tcp" -> ZERO_CONF_SMB
+                "_ftp._tcp." -> ZERO_CONF_FTP
+                "_webdav._tcp." -> ZERO_CONF_WEBDAV
+                "._nfs._tcp" -> ZERO_CONF_NFS
+                else -> throw IllegalArgumentException("Unknown media source type: $id")
+            }
+        }
+    }
+}
+
+/*@Parcelize
 sealed class MediaSourceType : Parcelable {
     data object Url : MediaSourceType()
 
@@ -58,4 +89,4 @@ sealed class MediaSourceType : Parcelable {
             }
         }
     }
-}
+}*/

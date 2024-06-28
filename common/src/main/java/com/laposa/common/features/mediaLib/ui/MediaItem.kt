@@ -42,6 +42,12 @@ fun MediaItem(
 ) {
     val focusRequester = remember { FocusRequester() }
 
+    val subTitle =
+        when (media) {
+            is MediaSourceGoUp -> "BACK"
+            else -> null
+        }
+
     LaunchedEffect(media) {
         if (index == 0) {
             focusRequester.requestFocus()
@@ -57,9 +63,13 @@ fun MediaItem(
                 .focusRequester(focusRequester)
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                when (media) {
-                    is MediaSourceFile -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    if (media is MediaSourceFile) {
                         if (media.thumbnailUrl != null) {
+
                             GlideImage(
                                 model = media.thumbnailUrl,
                                 contentDescription = media.name,
@@ -73,41 +83,18 @@ fun MediaItem(
                                     .size(56.dp)
                             )
                         }
-                    }
-
-                    is MediaSourceDirectory -> {
+                    } else {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_folder),
+                            painter = painterResource(getMediaItemIconId(media)),
                             contentDescription = media.name,
                             Modifier
                                 .size(56.dp)
                         )
                     }
-
-                    is MediaSourceShare -> {
-                        Icon(
-                            painter = painterResource(id = R.drawable.smb_share),
-                            contentDescription = media.name,
-                            Modifier
-                                .size(56.dp)
-                        )
-                    }
-
-                    is MediaSourceGoUp -> {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_move_up),
-                            contentDescription = media.name,
-                            Modifier
-                                .size(56.dp)
-                        )
-                    }
-
-                    else -> {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_block),
-                            contentDescription = media.name,
-                            Modifier
-                                .size(56.dp)
+                    if (subTitle != null) {
+                        Text(
+                            subTitle,
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                         )
                     }
                 }
@@ -122,5 +109,15 @@ fun MediaItem(
             textAlign = TextAlign.Start,
             color = Color.White
         )
+    }
+}
+
+fun getMediaItemIconId(media: MediaSourceFileBase): Int {
+    return when (media) {
+        is MediaSourceFile -> R.drawable.ic_media
+        is MediaSourceDirectory -> R.drawable.ic_folder
+        is MediaSourceShare -> R.drawable.smb_share
+        is MediaSourceGoUp -> R.drawable.ic_move_up
+        else -> R.drawable.ic_block
     }
 }

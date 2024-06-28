@@ -14,10 +14,6 @@ import kotlinx.coroutines.flow.flow
 class NfsMediaProvider(
     private val nfsService: NfsService
 ) : MediaSourceProvider() {
-    override val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = MutableStateFlow(
-        emptyMap()
-    )
-
     override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
         TODO("Not yet implemented")
     }
