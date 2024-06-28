@@ -1,50 +1,44 @@
-package com.laposa.domain.mediaSource.model.nfs
+package com.laposa.domain.mediaSource.sftp
 
 import com.laposa.domain.mediaSource.MediaSourceProvider
 import com.laposa.domain.mediaSource.model.MediaSource
-import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
-import com.laposa.domain.networkProtocols.nfs.NfsService
+import com.laposa.domain.networkProtocols.sftp.SFTPService
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 
-class NfsMediaProvider(
-    private val nfsService: NfsService
+class SftpMediaProvider(
+    private val sftpService: SFTPService,
 ) : MediaSourceProvider() {
-    override val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = MutableStateFlow(
-        emptyMap()
-    )
-
     override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
-        TODO("Not yet implemented")
+        return false
     }
 
     override suspend fun connectToMediaSourceWithRememberedLogin(mediaSource: MediaSource): Boolean {
-        TODO("Not yet implemented")
+        val result = connectToMediaSource(mediaSource, false)
+        println("connectToMediaSourceWithRememberedLogin: $mediaSource - $result")
+        return result
     }
 
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
-        userName: String?,
-        password: String?,
-        remember: Boolean,
+        remember: Boolean
     ): Boolean {
-        //nfsService.connect(mediaSource)
-        return true
+        return sftpService.connect(
+            mediaSource.connectionAddress!!,
+            mediaSource.username ?: "",
+            mediaSource.password ?: ""
+        )
     }
 
     override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {
-        TODO("Not yet implemented")
+        return sftpService.openFile(fileName)
     }
 
     override suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
-        TODO("Not yet implemented")
+        return emptyList()
     }
 
     override suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> {
-        TODO("Not yet implemented")
+        return sftpService.getContentOfDirectoryAtPath(path)
     }
 }

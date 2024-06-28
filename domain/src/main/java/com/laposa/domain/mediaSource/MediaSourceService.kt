@@ -1,34 +1,53 @@
 package com.laposa.domain.mediaSource
 
 import com.laposa.domain.mediaSource.model.MediaSource
-import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceType
-import com.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
-import com.laposa.domain.mediaSource.model.samba.SambaMediaProvider
+import com.laposa.domain.mediaSource.nfs.NfsMediaProvider
+import com.laposa.domain.mediaSource.samba.SambaMediaProvider
+import com.laposa.domain.mediaSource.sftp.SftpMediaProvider
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
+import com.laposa.domain.savedState.SavedStateService
 import com.laposa.domain.zeroConf.ZeroConfService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlin.reflect.KSuspendFunction1
 
 class MediaSourceService(
     private val zeroConf: ZeroConfService,
     private val sambaMediaProvider: SambaMediaProvider,
+    private val sftpMediaProvider: SftpMediaProvider,
     nfsMediaProvider: NfsMediaProvider,
+    private val savedStateService: SavedStateService,
 ) {
     private val _mediaSources = MutableStateFlow(emptyList<MediaSource>())
     val mediaSources: StateFlow<List<MediaSource>> = _mediaSources
 
     private val _mediaProviders: List<MediaSourceProvider> =
-        listOf(sambaMediaProvider, nfsMediaProvider)
+        listOf(sambaMediaProvider, nfsMediaProvider, sftpMediaProvider)
     private var _currentMediaProvider: MediaSourceProvider? = null
 
     private val _currentPath = MutableStateFlow<String>("")
     val currentPath: StateFlow<String> = _currentPath
 
     private var _currentShareName = ""
+
+    suspend fun getSavedMediaSources(): List<MediaSource> {
+        return savedStateService.getSavedMediaSources()
+    }
+
+    suspend fun addAndConnectManualMediaSource(
+        manualMediaSource: MediaSource,
+    ) {
+        val result = sftpMediaProvider.connectToMediaSource(
+            manualMediaSource,
+            true
+        )
+
+        if (result) {
+            savedStateService.addSavedMediaSources(manualMediaSource)
+        }
+    }
 
     private fun updateCurrentPath(newPath: String, fromGoBack: Boolean = false) {
         if (newPath != _currentPath.value && !fromGoBack) {
@@ -80,21 +99,19 @@ class MediaSourceService(
 
     suspend fun connectToMediaSource(
         mediaSource: MediaSource,
-        userName: String? = null,
-        password: String? = null,
         remember: Boolean,
     ) {
         _currentMediaProvider = getMediaProvider(mediaSource)
 
-        when (mediaSource.type) {
-            is MediaSourceType.ZeroConf -> {
+        when {
+            mediaSource.type.isZeroConf -> {
                 connectToZeroConfMediaSource(
                     mediaSource,
-                    userName,
-                    password,
                     remember
                 )
-            } else -> {}
+            }
+
+            else -> {}
         }
     }
 
@@ -115,26 +132,29 @@ class MediaSourceService(
 
     private fun getMediaProvider(mediaSource: MediaSource): MediaSourceProvider? {
         return when (mediaSource.type) {
-            is MediaSourceType.ZeroConf.SMB -> {
+
+            MediaSourceType.SMB -> {
                 _mediaProviders.find { it is SambaMediaProvider }
             }
 
-            is MediaSourceType.ZeroConf.NFS -> {
+            MediaSourceType.NSF -> {
                 _mediaProviders.find { it is NfsMediaProvider }
             }
 
-            else -> null
-        }
+            MediaSourceType.SFTP -> {
+                _mediaProviders.find { it is SftpMediaProvider }
+            }
+
+            else -> throw IllegalArgumentException("Unsupported media source type")
+        } ?: throw IllegalArgumentException("Could not find media provider for ${mediaSource.type}")
     }
 
     private suspend fun connectToZeroConfMediaSource(
         mediaSource: MediaSource,
-        userName: String? = null,
-        password: String? = null,
         remember: Boolean,
     ) {
         val result = _currentMediaProvider?.connectToMediaSource(
-            mediaSource, userName, password, remember
+            mediaSource, remember
         ) == true
 
         if (result) {

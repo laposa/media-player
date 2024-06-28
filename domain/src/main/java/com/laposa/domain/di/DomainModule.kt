@@ -3,20 +3,22 @@ package com.laposa.domain.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.SavedStateHandle
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import com.laposa.domain.mediaSource.MediaSourceService
-import com.laposa.domain.mediaSource.model.nfs.NfsMediaProvider
-import com.laposa.domain.mediaSource.model.samba.SambaMediaProvider
+import com.laposa.domain.mediaSource.nfs.NfsMediaProvider
+import com.laposa.domain.mediaSource.samba.SambaMediaProvider
+import com.laposa.domain.mediaSource.sftp.SftpMediaProvider
 import com.laposa.domain.networkProtocols.nfs.NfsService
+import com.laposa.domain.networkProtocols.sftp.SFTPService
 import com.laposa.domain.networkProtocols.smb.SmbService
 import com.laposa.domain.recents.RecentMediaService
 import com.laposa.domain.rememberLogin.RememberLoginService
 import com.laposa.domain.savedState.SavedStateService
 import com.laposa.domain.zeroConf.ZeroConfService
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
@@ -67,6 +69,12 @@ object DomainModule {
 
     @Singleton
     @Provides
+    fun provideSFTPService(): SFTPService {
+        return SFTPService()
+    }
+
+    @Singleton
+    @Provides
     fun provideNfsService(): NfsService {
         return NfsService()
     }
@@ -75,9 +83,10 @@ object DomainModule {
     @Provides
     fun provideSambaMediaProvider(
         smbService: SmbService,
-        rememberLoginService: RememberLoginService
+        rememberLoginService: RememberLoginService,
+        savedStateService: SavedStateService,
     ): SambaMediaProvider {
-        return SambaMediaProvider(smbService, rememberLoginService)
+        return SambaMediaProvider(smbService, savedStateService, rememberLoginService)
     }
 
     @Singleton
@@ -88,12 +97,26 @@ object DomainModule {
 
     @Singleton
     @Provides
+    fun provideSftpMediaProvider(sftpService: SFTPService): SftpMediaProvider {
+        return SftpMediaProvider(sftpService)
+    }
+
+    @Singleton
+    @Provides
     fun provideMediaSourceService(
         zeroConfService: ZeroConfService,
         smMediaProvider: SambaMediaProvider,
+        sftpMediaProvider: SftpMediaProvider,
         nfsMediaProvider: NfsMediaProvider,
+        savedStateService: SavedStateService,
     ): MediaSourceService {
-        return MediaSourceService(zeroConfService, smMediaProvider, nfsMediaProvider)
+        return MediaSourceService(
+            zeroConfService,
+            smMediaProvider,
+            sftpMediaProvider,
+            nfsMediaProvider,
+            savedStateService,
+        )
     }
 
     @Singleton

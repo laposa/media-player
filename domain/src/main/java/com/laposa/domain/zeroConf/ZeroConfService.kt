@@ -17,10 +17,10 @@ import kotlinx.coroutines.sync.withLock
 private const val TAG = "ZeroConfService"
 
 enum class ZeroConfServiceType(val id: String, private val secondaryId: String? = null) {
-    SMB("_smb._tcp.", "._smb._tcp"), FTP("_ftp._tcp."), WEBDAV("_webdav._tcp."), NFS(
-        "_nfs._tcp.",
-        "._nfs._tcp"
-    );
+    SMB("_smb._tcp.", "._smb._tcp"),
+    FTP("_ftp._tcp."),
+    WEBDAV("_webdav._tcp."),
+    NFS("_nfs._tcp.", "._nfs._tcp");
 
     fun isType(id: String): Boolean {
         return id.contains(this.id) || (secondaryId != null && id.contains(secondaryId))
@@ -47,6 +47,7 @@ class ZeroConfService(context: Context) {
         Log.i(TAG, "Starting discovery")
 
         discoveryStarted = true
+
         for (serviceType in serviceTypes) {
             nsdManager.discoverServices(
                 serviceType, NsdManager.PROTOCOL_DNS_SD, getDiscoveryListener(this)
@@ -88,22 +89,13 @@ class ZeroConfService(context: Context) {
 
                 coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     lock.withLock {
-                        resolveService(service)/*_discoveredServices.emit((_discoveredServices.value + service).distinctBy {
-                            it.serviceName
-                        })*/
+                        resolveService(service)
                     }
                 }
             }
 
             override fun onServiceLost(service: NsdServiceInfo) {
                 Log.e(TAG, "service lost: $service")
-                coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-//                    lock.withLock {
-//                        _discoveredServices.emit(
-//                            _discoveredServices.value.filter { it.serviceName != service.serviceName }
-//                        )
-//                    }
-                }
             }
 
             override fun onDiscoveryStopped(serviceType: String) {

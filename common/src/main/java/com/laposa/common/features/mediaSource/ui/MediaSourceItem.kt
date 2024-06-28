@@ -33,7 +33,7 @@ import com.laposa.domain.mediaSource.model.MediaSourceFile
 @Composable
 fun MediaSourceItem(
     mediaSource: MediaSourceModel,
-    setHomeContent: (@Composable () -> Unit) -> Unit,
+    setScreenContent: (@Composable () -> Unit) -> Unit,
     key: String,
     navigateToPlayer: ((MediaSourceFile?, String?) -> Unit),
     selectedKey: String?,
@@ -42,15 +42,8 @@ fun MediaSourceItem(
     index: Int,
 ) {
 
-    val focusRequester = FocusRequester()
     val viewModel: MediaSourceItemViewModel = viewModelFactory.create(mediaSource)
     val isLoading = viewModel.isLoading.collectAsState().value
-
-    LaunchedEffect(index) {
-        if (index == 0) {
-            focusRequester.requestFocus()
-        }
-    }
 
     fun playFile(mediaItem: MediaSourceFile) {
         viewModel.launch {
@@ -71,7 +64,7 @@ fun MediaSourceItem(
     fun onMediaSourceSelected(selected: MediaSourceModel) {
         onSelected(key)
 
-        setHomeContent {
+        setScreenContent {
             if (viewModel.isConnected.collectAsState().value) {
                 MediaLibrary(
                     title = mediaSource.displayName,
@@ -101,42 +94,11 @@ fun MediaSourceItem(
         }
     }
 
-    Column {
-        Card(
-            onClick = { onMediaSourceSelected(mediaSource) },
-            modifier = Modifier
-                .height(90.dp)
-                .width(150.dp)
-                .focusRequester(focusRequester)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.smb_share),
-                        contentDescription = mediaSource.displayName,
-                        Modifier
-                            .size(56.dp)
-                    )
-                    Text(
-                        mediaSource.type.toString(),
-                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = mediaSource.displayName,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Start,
-            color = Color.White
-        )
-    }
+    MediaSourceItemContent(
+        index = index,
+        title = mediaSource.displayName,
+        type = mediaSource.type.toString(),
+        icon = R.drawable.smb_share,
+        onClick = { onMediaSourceSelected(mediaSource) },
+    )
 }

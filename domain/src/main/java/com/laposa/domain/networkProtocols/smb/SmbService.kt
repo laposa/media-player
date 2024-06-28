@@ -9,34 +9,22 @@ import com.hierynomus.smbj.SMBClient
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.session.Session
 import com.hierynomus.smbj.share.DiskShare
-import com.rapid7.client.dcerpc.mssrvs.ServerService
-import com.rapid7.client.dcerpc.transport.SMBTransportFactories
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceShare
+import com.laposa.domain.networkProtocols.mediaFileExtensionsList
+import com.rapid7.client.dcerpc.mssrvs.ServerService
+import com.rapid7.client.dcerpc.transport.SMBTransportFactories
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
 class SmbService {
     private var client: SMBClient = SMBClient()
     private var _currentSession: Session? = null
-
-    private val _currentFilesList = MutableStateFlow<MutableMap<String, List<MediaSourceFile>>>(
-        mutableMapOf()
-    )
-    val filesList: StateFlow<Map<String, List<MediaSourceFile>>> = _currentFilesList
-
     private var _currentMediaSource: MediaSource? = null
-    private val _currentShares = MutableStateFlow<MutableMap<MediaSource, List<String>>>(
-        mutableMapOf()
-    )
-
-    val shares: StateFlow<Map<MediaSource, List<String>>> = _currentShares
+    private val _currentShares: MutableMap<MediaSource, List<String>> = mutableMapOf()
 
     private var _currentShare: DiskShare? = null
 
@@ -65,17 +53,14 @@ class SmbService {
 
             for (share in shares) {
                 if (!share.netName.contains("$")) {
-                    _currentShares.update {
-                        val currentMediaSourceShares = it[mediaSource] ?: emptyList()
-                        it[mediaSource] =
-                            (currentMediaSourceShares + share.netName).distinct()
-                        it
-                    }
+                    val currentMediaSourceShares = _currentShares[mediaSource] ?: emptyList()
+                    _currentShares[mediaSource] =
+                        (currentMediaSourceShares + share.netName).distinct()
                 }
             }
 
             // Try to connect to some share to find out if current authentication have enough permissions
-            _currentShares.value.values.firstOrNull()?.let {
+            _currentShares.values.firstOrNull()?.let {
                 _currentSession?.connectShare(it.first())
             }
 
@@ -91,7 +76,7 @@ class SmbService {
 
     suspend fun getCurrentShares(): List<MediaSourceShare> = withContext(Dispatchers.IO) {
         return@withContext _currentMediaSource?.let {
-            _currentShares.value[it]?.map {
+            _currentShares[it]?.map {
                 MediaSourceShare(it)
             }
         } ?: emptyList()
@@ -105,7 +90,7 @@ class SmbService {
     private fun getContentOfDirectoryAtPathInner(path: String): List<MediaSourceFileBase> {
         if (path == "" && _currentShare == null) {
             return _currentMediaSource?.let {
-                _currentShares.value[it]?.map {
+                _currentShares[it]?.map {
                     MediaSourceShare(it)
                 }
             } ?: emptyList()
@@ -122,7 +107,7 @@ class SmbService {
                         path,
                     )
                 } else {
-                    if (videoFilesExtensions.any {
+                    if (mediaFileExtensionsList.any {
                             item.fileName.contains(it)
                         }) {
                         MediaSourceFile(
@@ -172,18 +157,8 @@ class SmbService {
                 networkFile.fileInformation
             }
 
-            fun read(buffer: ByteArray, bufferOffset: Long, offset: Int, readLength: Int): Int {
-                try {
-                    return it.read(buffer, bufferOffset, offset, readLength)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return -1
-                }
-            }
-
             return@let InputStreamDataSourcePayload(
                 it::getInputStream,
-                ::read,
                 fileInformation.standardInformation.endOfFile
             )
         }
@@ -191,8 +166,5 @@ class SmbService {
 
     companion object {
         private const val TAG = "SmbService"
-        private val videoFilesExtensions = listOf(
-            ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm", ".m4v", ".mp3"
-        )
     }
 }
