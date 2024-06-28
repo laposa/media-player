@@ -14,25 +14,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.laposa.common.features.common.screens.EmptyListScreen
 import com.laposa.common.features.home.ui.LocalHomeNavigation
 import com.laposa.common.features.mediaSource.ui.LocalMediaSourceItemViewModelFactory
 import com.laposa.common.features.mediaSource.ui.MediaSourceItem
+import com.laposa.domain.mediaSource.model.MediaSource
 
 @Composable
 fun ZeroConfContent(
     viewModel: ZeroConfContentViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(true) {
-        viewModel.fetchMediaSources()
-    }
-
     val mediaSources = viewModel.mediaSources.collectAsState().value
     val mediaSourceItemViewModelFactory = LocalMediaSourceItemViewModelFactory.current
     val homeNavigation = LocalHomeNavigation.current
 
+    var savedMediaSources by remember {
+        mutableStateOf<List<MediaSource>?>(null)
+    }
+
     var content by remember {
         mutableStateOf<(@Composable () -> Unit)?>(null)
+    }
+
+    LaunchedEffect(true) {
+        viewModel.fetchMediaSources()
+        savedMediaSources = viewModel.getSavedMediaSources()
     }
 
     fun setContent(newContent: @Composable () -> Unit) {
@@ -50,6 +55,18 @@ fun ZeroConfContent(
         ) {
             item {
                 ManualMediaSourceItem(::setContent, homeNavigation::navigateToZeroConf)
+            }
+            itemsIndexed(savedMediaSources ?: emptyList()) { index, source ->
+                MediaSourceItem(
+                    mediaSource = source,
+                    setScreenContent = ::setContent,
+                    key = source.key,
+                    selectedKey = null,
+                    onSelected = {},
+                    viewModelFactory = mediaSourceItemViewModelFactory,
+                    index = index + 1,
+                    navigateToPlayer = homeNavigation::navigateToPlayer
+                )
             }
             itemsIndexed(mediaSources.sortedBy { it.type.toString() + it.displayName }) { index, source ->
                 MediaSourceItem(

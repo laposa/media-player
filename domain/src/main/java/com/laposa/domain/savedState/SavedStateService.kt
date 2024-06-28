@@ -4,8 +4,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
+import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceFile
-import com.laposa.domain.recents.RecentMedia
 import com.laposa.domain.recents.RecentMediaCollection
 import com.laposa.domain.rememberLogin.RememberLogin
 
@@ -71,9 +71,29 @@ class SavedStateService(
         }
     }
 
+    fun addSavedMediaSources(mediaSources: MediaSource) {
+        sharedPreferences.edit(true) {
+            val saved = getSavedMediaSources().toMutableList()
+            saved.add(mediaSources)
+            putStringSet(KEY_SAVED_MEDIA_SOURCES, saved.map { it.toJSON() }.toSet())
+        }
+    }
+
+    fun getSavedMediaSources(): List<MediaSource> {
+        return sharedPreferences.getStringSet(KEY_SAVED_MEDIA_SOURCES, null)
+            ?.map { MediaSource.fromJSON(it) }?.toSet()?.toList() ?: emptyList()
+    }
+
+    fun clearSavedMediaSources() {
+        sharedPreferences.edit(true) {
+            remove(KEY_SAVED_MEDIA_SOURCES)
+        }
+    }
+
     companion object {
         private const val KEY_SELECTED_MEDIA = "selectedMedia"
         private const val KEY_SELECTED_INPUT_STREAM_DATA_SOURCE = "selectedInputStreamDataSource"
         private const val KEY_RECENT_MEDIA = "recentMedia"
+        private const val KEY_SAVED_MEDIA_SOURCES = "savedMediaSources"
     }
 }

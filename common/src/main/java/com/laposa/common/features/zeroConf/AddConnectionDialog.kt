@@ -32,19 +32,23 @@ import androidx.tv.material3.Text
 import com.laposa.common.features.common.composables.selectDialog.SelectDialog
 import com.laposa.common.theme.surfaceDark
 import com.laposa.common.ui.theme.ComponentsTheme
-import com.laposa.domain.mediaSource.model.ManualMediaSource
+import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceType
 
 @Composable
 fun AddConnectionDialog(
-    onSubmit: (ManualMediaSource) -> Unit,
+    onSubmit: (MediaSource) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var connectionType by remember {
-        mutableStateOf(MediaSourceType.ManualMediaSourceType.SFTP)
+        mutableStateOf(MediaSourceType.SFTP)
     }
 
     val scrollState = rememberScrollState()
+
+    var name by remember {
+        mutableStateOf<String>("")
+    }
 
     var hostName by remember {
         mutableStateOf<String>("192.168.31.226")
@@ -61,8 +65,10 @@ fun AddConnectionDialog(
 
     fun addAndConnect() {
         onSubmit(
-            ManualMediaSource(
-                hostName = hostName,
+            MediaSource(
+                sourceName = connectionType.name,
+                displayName = name,
+                connectionAddress = hostName,
                 port = port.toInt(),
                 username = userName,
                 password = password,
@@ -101,11 +107,21 @@ fun AddConnectionDialog(
                         .background(Color.Transparent)
                         .verticalScroll(scrollState)
                 ) {
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        placeholder = { Text("My Home Server") },
+                        label = { Text("Connection Name") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        colors = ComponentsTheme.textInputColors(),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     SelectDialog(
                         value = connectionType,
                         title = "Connection Type",
                         getOptionTitle = { it.name },
-                        options = MediaSourceType.ManualMediaSourceType.entries
+                        options = MediaSourceType.entries
                     ) {
                         connectionType = it
                     }

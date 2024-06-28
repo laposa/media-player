@@ -9,13 +9,14 @@ import com.hierynomus.smbj.SMBClient
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.session.Session
 import com.hierynomus.smbj.share.DiskShare
-import com.rapid7.client.dcerpc.mssrvs.ServerService
-import com.rapid7.client.dcerpc.transport.SMBTransportFactories
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceShare
+import com.laposa.domain.networkProtocols.mediaFileExtensionsList
+import com.rapid7.client.dcerpc.mssrvs.ServerService
+import com.rapid7.client.dcerpc.transport.SMBTransportFactories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -106,7 +107,7 @@ class SmbService {
                         path,
                     )
                 } else {
-                    if (videoFilesExtensions.any {
+                    if (mediaFileExtensionsList.any {
                             item.fileName.contains(it)
                         }) {
                         MediaSourceFile(
@@ -156,18 +157,8 @@ class SmbService {
                 networkFile.fileInformation
             }
 
-            fun read(buffer: ByteArray, bufferOffset: Long, offset: Int, readLength: Int): Int {
-                try {
-                    return it.read(buffer, bufferOffset, offset, readLength)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return -1
-                }
-            }
-
             return@let InputStreamDataSourcePayload(
                 it::getInputStream,
-                ::read,
                 fileInformation.standardInformation.endOfFile
             )
         }
@@ -175,8 +166,5 @@ class SmbService {
 
     companion object {
         private const val TAG = "SmbService"
-        private val videoFilesExtensions = listOf(
-            ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm", ".m4v", ".mp3"
-        )
     }
 }

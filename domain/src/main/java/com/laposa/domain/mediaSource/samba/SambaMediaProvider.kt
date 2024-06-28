@@ -1,30 +1,28 @@
-package com.laposa.domain.mediaSource.model.samba
+package com.laposa.domain.mediaSource.samba
 
 import com.laposa.domain.mediaSource.MediaSourceProvider
 import com.laposa.domain.mediaSource.model.MediaSource
-import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import com.laposa.domain.networkProtocols.smb.SmbService
 import com.laposa.domain.rememberLogin.RememberLoginService
-import kotlinx.coroutines.flow.StateFlow
+import com.laposa.domain.savedState.SavedStateService
 
 class SambaMediaProvider(
     private val smbService: SmbService,
+    private val savedStateService: SavedStateService,
     private val rememberLoginService: RememberLoginService,
 ) : MediaSourceProvider() {
     private var currentShare: String? = null
 
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
-        userName: String?,
-        password: String?,
         remember: Boolean,
     ): Boolean {
-        val result = smbService.connect(mediaSource, userName, password)
+        val result = smbService.connect(mediaSource, mediaSource.username, mediaSource.password)
 
         if (result && remember) {
-            rememberLogin(mediaSource, userName, password)
+            savedStateService.addSavedMediaSources(mediaSource)
         }
 
         return result
@@ -48,7 +46,7 @@ class SambaMediaProvider(
     }
 
     override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
-        val result = connectToMediaSource(mediaSource, null, null, false)
+        val result = connectToMediaSource(mediaSource, false)
         return result
     }
 
@@ -56,7 +54,7 @@ class SambaMediaProvider(
         mediaSource: MediaSource
     ): Boolean {
         val result = rememberLoginService.getRememberedLogin(mediaSource.key)?.let {
-            connectToMediaSource(mediaSource, it.userName, it.password, false)
+            connectToMediaSource(mediaSource, false)
         } ?: false
 
         return result

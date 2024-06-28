@@ -76,7 +76,7 @@ class MediaSourceItemViewModel(
         launch(handleError = false) {
             try {
                 when (selectedMediaSource.type) {
-                    MediaSourceType.ZERO_CONF_SMB -> {
+                    MediaSourceType.SMB -> {
                         connectToMediaSourceInternal(
                             selectedMediaSource, userName, password, remember
                         )
@@ -111,16 +111,12 @@ class MediaSourceItemViewModel(
         password: String? = null,
         remember: Boolean,
     ) {
-        when (mediaSource.type) {
-            MediaSourceType.ZERO_CONF_SMB -> {
-                mediaSourceService.connectToMediaSource(mediaSource, userName, password, remember)
-            }
-
-            else -> {
-                mediaSourceService.connectToMediaSource(mediaSource, null, null, remember)
-            }
-        }
-
+        mediaSourceService.connectToMediaSource(
+            mediaSource.copy(
+                username = userName,
+                password = password
+            ), remember
+        )
         onConnectionSuccess()
     }
 
