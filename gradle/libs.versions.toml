@@ -30,6 +30,8 @@ nfsClient = "1.1.0"
 appacheCommons = "2.9.0"
 gson = "2.11.0"
 jsch = "0.1.55"
+vlcLib = "4.0.0-eap15"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +69,7 @@ nfsClient = { group = "com.emc.ecs", name = "nfs-client", version.ref = "nfsClie
 vfs = { group = "org.apache.commons", name = "commons-vfs2", version.ref = "appacheCommons" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 jsch = { group = "com.jcraft", name = "jsch", version.ref = "jsch" }
+vlcLib = { group = "org.videolan.android", name = "libvlc-all", version.ref = "vlcLib" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

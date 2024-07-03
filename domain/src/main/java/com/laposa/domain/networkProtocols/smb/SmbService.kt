@@ -157,9 +157,14 @@ class SmbService {
                 networkFile.fileInformation
             }
 
+            val userName = _currentMediaSource?.username
+            val password = _currentMediaSource?.password
+            val hostName = _currentMediaSource?.connectionAddress
+
             return@let InputStreamDataSourcePayload(
                 it::getInputStream,
-                fileInformation.standardInformation.endOfFile
+                fileInformation.standardInformation.endOfFile,
+                "smb://$userName:$password@$hostName/${_currentShare?.smbPath?.shareName}$fileName",
             )
         }
     }

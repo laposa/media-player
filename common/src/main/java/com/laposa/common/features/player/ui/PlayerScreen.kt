@@ -5,12 +5,9 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,7 +27,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.Date
 
 @Composable
 fun PlayerScreen(
@@ -69,6 +65,10 @@ fun PlayerScreen(
         }
     }
 
+    if (shouldDismiss) {
+        hidePlayerScreen()
+    }
+
     Dialog(
         onDismissRequest = { shouldDismiss = true },
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -80,20 +80,26 @@ fun PlayerScreen(
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
             selectedMedia?.let {
-                PlayerView(
+                VLCPlayerView(
+                    it.path,
+                )
+                /*PlayerView(
                     fileName = fileName,
                     url = it.path,
                     shouldDismiss = shouldDismiss,
                     dismiss = hidePlayerScreen,
                     saveThumbnail = ::saveThumbnail
-                )
+                )*/
             } ?: selectedInputStreamDataSourcePayload?.let {
-                PlayerView(
+                /*PlayerView(
                     fileName = fileName,
                     payload = it,
                     shouldDismiss = shouldDismiss,
                     dismiss = hidePlayerScreen,
                     saveThumbnail = ::saveThumbnail
+                )*/
+                VLCPlayerView(
+                    payload = it
                 )
             } ?: run {
                 Column {

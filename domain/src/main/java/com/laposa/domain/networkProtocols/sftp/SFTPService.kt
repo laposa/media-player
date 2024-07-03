@@ -18,12 +18,20 @@ class SFTPService {
     private var session: Session? = null
     private var channel: ChannelSftp? = null
 
+    private var currentUserName: String? = null
+    private var currentPassword: String? = null
+    private var currentHost: String? = null
+
     suspend fun connect(
         host: String,
         user: String,
         password: String,
         port: Int = 22,
     ): Boolean = withContext(Dispatchers.IO) {
+        currentUserName = user
+        currentPassword = password
+        currentHost = host
+
         try {
             session = jsch.getSession(user, host, port)
             session?.setPassword(password)
@@ -98,6 +106,7 @@ class SFTPService {
             return@withContext InputStreamDataSourcePayload(
                 { channel?.get(fileName) },
                 length,
+                "sftp://$currentUserName:$currentPassword@$currentHost:22//$fileName"
             )
         }
 

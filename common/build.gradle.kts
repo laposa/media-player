@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.javapoet)
     implementation(libs.glide)
     implementation(libs.androidx.compose.runtime.livedata)
+    implementation(libs.vlcLib)
+    implementation(libs.androidx.media3.ui)
 
     implementation(project(":domain"))
 }

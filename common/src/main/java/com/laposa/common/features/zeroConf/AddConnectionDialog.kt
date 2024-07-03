@@ -54,13 +54,13 @@ fun AddConnectionDialog(
         mutableStateOf<String>("192.168.31.226")
     }
     var userName by remember {
-        mutableStateOf<String>("laposa")
+        mutableStateOf<String>("frenkybojler")
     }
     var password by remember {
-        mutableStateOf<String>("Test1234")
+        mutableStateOf<String>("F98zi6o6")
     }
     var port by remember {
-        mutableStateOf<String>("22")
+        mutableStateOf<String>("")
     }
 
     fun addAndConnect() {
@@ -69,7 +69,7 @@ fun AddConnectionDialog(
                 sourceName = connectionType.name,
                 displayName = name,
                 connectionAddress = hostName,
-                port = port.toInt(),
+                port = if (port.isNotEmpty()) port.toInt() else null,
                 username = userName,
                 password = password,
                 type = connectionType
