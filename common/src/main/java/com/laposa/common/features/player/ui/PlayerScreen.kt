@@ -25,6 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.Text
 import com.laposa.common.theme.VideoPlayerTypography
 import com.laposa.common.theme.surfaceDark
+import com.laposa.domain.mediaSource.model.MediaSourceFile
+import com.laposa.domain.mediaSource.model.MediaSourceType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -34,25 +36,20 @@ import java.util.Date
 
 @Composable
 fun PlayerScreen(
+    fileToPlay: MediaSourceFile,
     hidePlayerScreen: () -> Unit,
     viewModel: PlayerScreenViewModel = hiltViewModel()
 ) {
-    val selectedMedia = viewModel.selectedMedia.observeAsState().value
-    val selectedInputStreamDataSourcePayload =
-        viewModel.selectedInputStreamDataSourcePayload.collectAsState().value
-    val selectedInputStreamDataSourceFileName =
-        viewModel.selectedInputStreamDataSourceFileName.observeAsState().value
+    viewModel.setFileToPlay(fileToPlay)
 
-    val fileName = selectedMedia?.path ?: selectedInputStreamDataSourceFileName ?: "file"
+    val fileName = viewModel.currentMediaFile.collectAsState().value?.name ?: ""
+    val url = viewModel.url.collectAsState().value
+    val payload = viewModel.payload.collectAsState().value
 
     val context = LocalContext.current
 
     var shouldDismiss by remember {
         mutableStateOf(false)
-    }
-
-    viewModel.selectedMedia.observeForever {
-        println("selectedMedia changed to $it")
     }
 
     fun saveThumbnail(fileName: String, bitmap: Bitmap, progress: Long) {
@@ -63,10 +60,9 @@ fun PlayerScreen(
         }
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.clearSelectedMedia()
-        }
+    fun onDismiss() {
+        hidePlayerScreen()
+        viewModel.clearFileToPlay()
     }
 
     Dialog(
@@ -79,20 +75,20 @@ fun PlayerScreen(
                 .background(surfaceDark),
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
-            selectedMedia?.let {
+            url?.let {
                 PlayerView(
                     fileName = fileName,
-                    url = it.path,
+                    url = it,
                     shouldDismiss = shouldDismiss,
-                    dismiss = hidePlayerScreen,
+                    dismiss = ::onDismiss,
                     saveThumbnail = ::saveThumbnail
                 )
-            } ?: selectedInputStreamDataSourcePayload?.let {
+            } ?: payload?.let {
                 PlayerView(
                     fileName = fileName,
                     payload = it,
                     shouldDismiss = shouldDismiss,
-                    dismiss = hidePlayerScreen,
+                    dismiss = ::onDismiss,
                     saveThumbnail = ::saveThumbnail
                 )
             } ?: run {

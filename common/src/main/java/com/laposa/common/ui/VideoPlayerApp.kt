@@ -32,6 +32,5 @@ private fun Route(appState: VideoPlayerAppState) {
                 Home()
             }
         }
-        composable(Screen.Player.route) { GlobalNavigationContainer(appState = appState) { PlayerScreen({}) } }
     }
 }

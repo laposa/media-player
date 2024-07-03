@@ -3,6 +3,7 @@ package com.laposa.common.features.sampleMedia.ui
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.laposa.domain.mediaSource.model.MediaSourceFile
+import com.laposa.domain.mediaSource.model.MediaSourceType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -15,22 +16,26 @@ class SampleMediaScreenViewModel @Inject constructor(
             MediaSourceFile(
                 name = "Big Buck Bunny",
                 path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
+                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+                type = MediaSourceType.URL
             ),
             MediaSourceFile(
                 name = "Elephant Dream",
                 path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg"
+                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
+                type = MediaSourceType.URL
             ),
             MediaSourceFile(
                 name = "For Bigger Blazes For Bigger Blazes For Bigger Blazes For Bigger Blazes",
                 path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg"
+                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
+                type = MediaSourceType.URL
             ),
             MediaSourceFile(
                 name = "For Bigger Escape",
                 path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg"
+                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg",
+                type = MediaSourceType.URL
             ),
         ),
     )

@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import com.laposa.common.features.mediaSource.ui.MediaSourceItemViewModelFactory
 import com.laposa.domain.mediaSource.MediaSourceService
+import com.laposa.domain.mediaSource.MediaSourceServiceFactory
 import com.laposa.domain.savedState.SavedStateService
 
 @Module
@@ -15,9 +16,9 @@ object CommonModule {
     @Provides
     fun provideMediaSourceItemViewModelFactory(
         savedStateHandle: SavedStateHandle,
-        mediaSourceService: MediaSourceService,
+        mediaSourceServiceFactory: MediaSourceServiceFactory,
         savedStateService: SavedStateService,
     ): MediaSourceItemViewModelFactory = MediaSourceItemViewModelFactory(
-        savedStateHandle, mediaSourceService, savedStateService
+        savedStateHandle, mediaSourceServiceFactory, savedStateService
     )
 }

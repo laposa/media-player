@@ -14,6 +14,7 @@ import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceShare
+import com.laposa.domain.mediaSource.model.MediaSourceType
 import com.laposa.domain.networkProtocols.mediaFileExtensionsList
 import com.rapid7.client.dcerpc.mssrvs.ServerService
 import com.rapid7.client.dcerpc.transport.SMBTransportFactories
@@ -113,6 +114,7 @@ class SmbService {
                         MediaSourceFile(
                             item.fileName,
                             path,
+                            MediaSourceType.SMB
                         )
                     } else {
                         null

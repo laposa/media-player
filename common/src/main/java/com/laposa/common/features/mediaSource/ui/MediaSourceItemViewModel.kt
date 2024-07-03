@@ -3,6 +3,7 @@ package com.laposa.common.features.mediaSource.ui
 import androidx.lifecycle.SavedStateHandle
 import com.laposa.common.features.common.ViewModelBase
 import com.laposa.domain.mediaSource.MediaSourceService
+import com.laposa.domain.mediaSource.MediaSourceServiceFactory
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
@@ -14,9 +15,13 @@ import kotlinx.coroutines.flow.StateFlow
 
 class MediaSourceItemViewModel(
     private val selectedMediaSource: MediaSource,
-    private val mediaSourceService: MediaSourceService,
+    mediaSourceServiceFactory: MediaSourceServiceFactory,
     private val savedStateService: SavedStateService
 ) : ViewModelBase() {
+
+    private val mediaSourceService: MediaSourceService =
+        mediaSourceServiceFactory.getOrCreate(selectedMediaSource.type)
+
     private val _isLoginViewModelVisible = MutableStateFlow(false)
     val isLoginDialogVisible: StateFlow<Boolean> = _isLoginViewModelVisible
 
@@ -94,14 +99,10 @@ class MediaSourceItemViewModel(
         }
     }
 
-    suspend fun onFileSelected(
-        sourceFile: MediaSourceFile, playFile: (MediaSourceFile?, String?) -> Unit
+    fun onFileSelected(
+        sourceFile: MediaSourceFile, playFile: (MediaSourceFile) -> Unit
     ) {
-        val fileFullPath = sourceFile.fullPath
-        mediaSourceService.getFile(fileFullPath)?.let {
-            savedStateService.setSelectedInputStreamDataSourceFileName(fileFullPath)
-            playFile(null, fileFullPath)
-        }
+        playFile(sourceFile)
     }
 
 
@@ -128,7 +129,7 @@ class MediaSourceItemViewModel(
 
 class MediaSourceItemViewModelFactory(
     private val savedStateHandle: SavedStateHandle,
-    private val mediaSourceService: MediaSourceService,
+    private val mediaSourceServiceFactory: MediaSourceServiceFactory,
     private val savedStateService: SavedStateService,
 ) {
     private var instances: MutableMap<String, MediaSourceItemViewModel> = mutableMapOf()
@@ -144,7 +145,7 @@ class MediaSourceItemViewModelFactory(
 
     private fun createInstance(mediaSource: MediaSource): MediaSourceItemViewModel {
         instances[getInstanceKey(mediaSource)] =
-            MediaSourceItemViewModel(mediaSource, mediaSourceService, savedStateService)
+            MediaSourceItemViewModel(mediaSource, mediaSourceServiceFactory, savedStateService)
         savedStateHandle[INSTANCES_MAP_KEY] = instances
         return instances[getInstanceKey(mediaSource)]!!
     }

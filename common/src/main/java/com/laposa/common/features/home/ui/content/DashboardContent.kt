@@ -7,7 +7,7 @@ import com.laposa.common.features.sampleMedia.ui.SampleMediaScreen
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 
 @Composable
-fun Dashboard(onNavigateToPlayer: (MediaSourceFile?, String?) -> Unit) {
+fun Dashboard(onNavigateToPlayer: (MediaSourceFile) -> Unit) {
     Column {
         RecentsLib()
         SampleMediaScreen(navigateToPlayer = onNavigateToPlayer)

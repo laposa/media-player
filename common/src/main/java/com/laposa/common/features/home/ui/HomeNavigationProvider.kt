@@ -25,7 +25,7 @@ fun ProvideHomeNavController(
 
 class HomeNavigation(
     val homeNavController: NavHostController,
-    val goToPlayer: (MediaSourceFile?, String?) -> Unit,
+    val goToPlayer: (MediaSourceFile) -> Unit,
 ) {
     val currentRoute = homeNavController.currentBackStackEntryFlow.map {
         it.destination.route
@@ -35,9 +35,8 @@ class HomeNavigation(
         homeNavController.navigate(screen.route)
     }
 
-    fun navigateToPlayer(fileToPlay: MediaSourceFile?, filePath: String?) {
-        //navigateTo(Screen.Player.route)
-        goToPlayer(fileToPlay, filePath)
+    fun navigateToPlayer(fileToPlay: MediaSourceFile) {
+        goToPlayer(fileToPlay)
     }
 
     fun navigateToHome() {

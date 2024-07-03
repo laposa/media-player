@@ -8,6 +8,7 @@ import com.jcraft.jsch.Session
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
+import com.laposa.domain.mediaSource.model.MediaSourceType
 import com.laposa.domain.networkProtocols.mediaFileExtensionsList
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import kotlinx.coroutines.Dispatchers
@@ -79,7 +80,8 @@ class SFTPService {
                         files.add(
                             MediaSourceFile(
                                 item.filename,
-                                path
+                                path,
+                                MediaSourceType.SFTP
                             )
                         )
                     }
@@ -91,7 +93,7 @@ class SFTPService {
             return@withContext files
         }
 
-    suspend fun openFile(fileName: String): InputStreamDataSourcePayload? =
+    suspend fun openFile(fileName: String): InputStreamDataSourcePayload =
         withContext(Dispatchers.IO) {
             openChannel()
             val length = channel?.lstat(fileName)?.size ?: -1

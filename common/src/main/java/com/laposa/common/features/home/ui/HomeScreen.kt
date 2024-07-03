@@ -23,6 +23,8 @@ fun Home(
         HomeNavigation(homeNavController, viewModel::showPlayer)
     }
 
+    val fileToPlay = viewModel.fileToPlay.collectAsState().value
+
     ProvideHomeNavController(homeNavigation = homeNavigation) {
         Surface(
             modifier = Modifier.padding(
@@ -33,9 +35,10 @@ fun Home(
             )
         ) {
             Menu()
-            if (viewModel.isPlayerVisible.collectAsState().value) {
+            if (fileToPlay != null) {
                 PlayerScreen(
-                    viewModel::hidePlayer
+                    fileToPlay,
+                    viewModel::hidePlayer,
                 )
             }
         }

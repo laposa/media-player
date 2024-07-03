@@ -5,11 +5,13 @@ import android.content.Context.NSD_SERVICE
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
+import com.laposa.domain.mediaSource.model.MediaSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -40,7 +42,20 @@ class ZeroConfService(context: Context) {
             mutableListOf()
         )
 
-    val discoveredServices: StateFlow<List<NsdServiceInfo>> = _discoveredServices
+    private val discoveredServices: StateFlow<List<NsdServiceInfo>> = _discoveredServices
+    private val _mediaSources = MutableStateFlow(emptyList<MediaSource>())
+    val mediaSources: StateFlow<List<MediaSource>> = _mediaSources
+
+    suspend fun fetchMediaSources() {
+        startDiscovery()
+
+        discoveredServices.collectLatest { services ->
+            _mediaSources.value = services.map {
+                MediaSource.fromNSD(it)
+            }
+        }
+    }
+
     suspend fun startDiscovery() = coroutineScope {
         if (discoveryStarted) return@coroutineScope
 
