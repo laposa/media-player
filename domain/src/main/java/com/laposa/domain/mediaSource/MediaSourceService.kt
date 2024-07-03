@@ -1,5 +1,6 @@
 package com.laposa.domain.mediaSource
 
+import androidx.lifecycle.SavedStateHandle
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceType
@@ -14,32 +15,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 
 class MediaSourceService(
+    private val provider: MediaSourceProvider,
     private val zeroConf: ZeroConfService,
-    private val sambaMediaProvider: SambaMediaProvider,
-    private val sftpMediaProvider: SftpMediaProvider,
-    nfsMediaProvider: NfsMediaProvider,
     private val savedStateService: SavedStateService,
 ) {
     private val _mediaSources = MutableStateFlow(emptyList<MediaSource>())
     val mediaSources: StateFlow<List<MediaSource>> = _mediaSources
 
-    private val _mediaProviders: List<MediaSourceProvider> =
-        listOf(sambaMediaProvider, nfsMediaProvider, sftpMediaProvider)
-    private var _currentMediaProvider: MediaSourceProvider? = null
-
     private val _currentPath = MutableStateFlow<String>("")
     val currentPath: StateFlow<String> = _currentPath
 
     private var _currentShareName = ""
-
-    suspend fun getSavedMediaSources(): List<MediaSource> {
-        return savedStateService.getSavedMediaSources()
-    }
-
     suspend fun addAndConnectManualMediaSource(
         manualMediaSource: MediaSource,
     ) {
-        val result = sftpMediaProvider.connectToMediaSource(
+        val result = provider.connectToMediaSource(
             manualMediaSource,
             true
         )
@@ -71,7 +61,7 @@ class MediaSourceService(
 
     suspend fun getContentOfDirectoryAthPath(path: String): Pair<String, List<MediaSourceFileBase>> {
         updateCurrentPath(path)
-        return _currentPath.value to (_currentMediaProvider?.getContentOfDirectoryAtPath(
+        return _currentPath.value to (provider.getContentOfDirectoryAtPath(
             _currentPath.value
         )
             ?: emptyList())
@@ -80,29 +70,19 @@ class MediaSourceService(
     suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
         updateCurrentPath(shareName)
         _currentShareName = shareName
-        return sambaMediaProvider.openShare(shareName)
+        return provider.openShare(shareName)
     }
 
     suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {
-        return _currentMediaProvider?.getFile(fileName)
+        return provider.getFile(fileName)
     }
 
-    suspend fun fetchMediaSources() {
-        zeroConf.startDiscovery()
 
-        zeroConf.discoveredServices.collectLatest { services ->
-            _mediaSources.value = services.map {
-                MediaSource.fromNSD(it)
-            }
-        }
-    }
 
     suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         remember: Boolean,
     ) {
-        _currentMediaProvider = getMediaProvider(mediaSource)
-
         when {
             mediaSource.type.isZeroConf -> {
                 connectToZeroConfMediaSource(
@@ -116,9 +96,7 @@ class MediaSourceService(
     }
 
     suspend fun tryToConnectToMediaSource(mediaSource: MediaSource): Boolean {
-        _currentMediaProvider = getMediaProvider(mediaSource)
-
-        return _currentMediaProvider?.let {
+        return provider.let {
             if (!it.connectToMediaSourceAsAGuest(mediaSource)) {
                 if (!it.connectToMediaSourceWithRememberedLogin(mediaSource)) {
                     return@let false
@@ -130,32 +108,13 @@ class MediaSourceService(
         } ?: false
     }
 
-    private fun getMediaProvider(mediaSource: MediaSource): MediaSourceProvider? {
-        return when (mediaSource.type) {
-
-            MediaSourceType.SMB -> {
-                _mediaProviders.find { it is SambaMediaProvider }
-            }
-
-            MediaSourceType.NSF -> {
-                _mediaProviders.find { it is NfsMediaProvider }
-            }
-
-            MediaSourceType.SFTP -> {
-                _mediaProviders.find { it is SftpMediaProvider }
-            }
-
-            else -> throw IllegalArgumentException("Unsupported media source type")
-        } ?: throw IllegalArgumentException("Could not find media provider for ${mediaSource.type}")
-    }
-
     private suspend fun connectToZeroConfMediaSource(
         mediaSource: MediaSource,
         remember: Boolean,
     ) {
-        val result = _currentMediaProvider?.connectToMediaSource(
+        val result = provider.connectToMediaSource(
             mediaSource, remember
-        ) == true
+        )
 
         if (result) {
             markMediaSourceAsConnected(mediaSource)
@@ -172,3 +131,51 @@ class MediaSourceService(
         }
     }
 }
+
+class MediaSourceServiceFactory(
+    private val savedStateHandle: SavedStateHandle,
+    private val zeroConfService: ZeroConfService,
+    private val savedStateService: SavedStateService,
+    private val sambaMediaProvider: SambaMediaProvider,
+    private val nfsMediaProvider: NfsMediaProvider,
+    private val sftpMediaProvider: SftpMediaProvider,
+) {
+    private var instances: MutableMap<String, MediaSourceService> = mutableMapOf()
+    init {
+        instances = savedStateHandle[INSTANCES_MAP_KEY] ?: mutableMapOf()
+    }
+
+    fun getOrCreate(mediaSourceType: MediaSourceType): MediaSourceService {
+        val provider = getMediaSourceProvider(mediaSourceType)
+        val result = instances[getInstanceKey(provider)] ?: createInstance(provider)
+        return result
+    }
+
+    private fun createInstance(provider: MediaSourceProvider): MediaSourceService {
+        instances[getInstanceKey(provider)] = MediaSourceService(
+            provider,
+            zeroConfService,
+            savedStateService
+        )
+        savedStateHandle[INSTANCES_MAP_KEY] = instances
+        return instances[getInstanceKey(provider)]!!
+    }
+
+    private fun getInstanceKey(provider: MediaSourceProvider): String {
+        return provider::class.simpleName!!
+    }
+
+    private fun getMediaSourceProvider(mediaSourceType: MediaSourceType): MediaSourceProvider {
+        return when (mediaSourceType) {
+            MediaSourceType.SMB -> sambaMediaProvider
+            MediaSourceType.NSF -> nfsMediaProvider
+            MediaSourceType.SFTP -> sftpMediaProvider
+            else -> throw IllegalArgumentException("Unknown media source type")
+        }
+    }
+
+    companion object {
+        const val INSTANCES_MAP_KEY = "MediaSourceServiceFactory"
+    }
+}
+

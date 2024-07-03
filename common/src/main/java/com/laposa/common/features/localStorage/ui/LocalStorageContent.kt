@@ -62,7 +62,7 @@ fun LocalStorageContent(
         }
     } else {
         LocalStorageMediaLib {
-            homeNavigation.navigateToPlayer(it, null)
+            homeNavigation.navigateToPlayer(it)
         }
     }
 }

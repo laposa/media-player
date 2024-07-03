@@ -35,7 +35,7 @@ fun MediaSourceItem(
     mediaSource: MediaSourceModel,
     setScreenContent: (@Composable () -> Unit) -> Unit,
     key: String,
-    navigateToPlayer: ((MediaSourceFile?, String?) -> Unit),
+    navigateToPlayer: ((MediaSourceFile) -> Unit),
     selectedKey: String?,
     onSelected: (key: String) -> Unit,
     viewModelFactory: MediaSourceItemViewModelFactory,

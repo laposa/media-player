@@ -11,10 +11,10 @@ import com.laposa.domain.mediaSource.model.MediaSourceShare
 @Composable
 fun SampleMediaScreen(
     viewModel: SampleMediaScreenViewModel = hiltViewModel(),
-    navigateToPlayer: (MediaSourceFile?, String?) -> Unit
+    navigateToPlayer: (MediaSourceFile) -> Unit
 ) {
     fun onMediaSelected(media: MediaSourceFile) {
-        navigateToPlayer(media, null)
+        navigateToPlayer(media)
     }
 
     fun onDirectorySelected(dir: MediaSourceDirectory) {

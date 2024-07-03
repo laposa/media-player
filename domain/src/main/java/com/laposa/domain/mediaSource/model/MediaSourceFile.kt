@@ -25,8 +25,8 @@ abstract class MediaSourceFileWithPath : MediaSourceFileBase() {
 data class MediaSourceFile(
     override val name: String,
     override val path: String,
+    val type: MediaSourceType,
     val thumbnailUrl: String? = null,
-    val type: MediaSourceType? = null,
 ) : MediaSourceFileWithPath(), Parcelable {
     @IgnoredOnParcel
     val fullPath: String = when {

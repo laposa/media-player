@@ -40,10 +40,6 @@ fun HomeContent(
             ZeroConfContent()
         }
 
-        composable(Screen.Player.route) {
-            PlayerScreen({})
-        }
-
         composable(Screen.Settings.route) {
             SettingsScreen()
         }

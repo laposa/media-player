@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.laposa.common.features.common.ViewModelBase
 import com.laposa.domain.mediaSource.MediaSourceService
+import com.laposa.domain.mediaSource.MediaSourceServiceFactory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
+import com.laposa.domain.mediaSource.model.MediaSourceType
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import com.laposa.domain.recents.RecentMedia
 import com.laposa.domain.recents.RecentMediaService
@@ -15,53 +17,54 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayerScreenViewModel @Inject constructor(
-    private val savedStateService: SavedStateService,
-    mediaSourceService: MediaSourceService,
+    private val mediaSourceServiceFactory: MediaSourceServiceFactory,
     private val recentMediaService: RecentMediaService,
 ) : ViewModelBase() {
-    val selectedMedia: LiveData<MediaSourceFile?> = savedStateService.getSelectedMedia()
+    private var _currentMediaFile: MutableStateFlow<MediaSourceFile?> = MutableStateFlow(null)
+    val currentMediaFile: StateFlow<MediaSourceFile?> = _currentMediaFile
 
-    private val _selectedInputStreamDataSourceFile =
-        savedStateService.getSelectedInputStreamDataSourceFileName()
+    private val _payload: MutableStateFlow<InputStreamDataSourcePayload?> = MutableStateFlow(null)
+    val payload: StateFlow<InputStreamDataSourcePayload?> = _payload
 
-    val selectedInputStreamDataSourceFileName: LiveData<String?> =
-        _selectedInputStreamDataSourceFile
+    private val _url: MutableStateFlow<String?> = MutableStateFlow(null)
+    val url: StateFlow<String?> = _url
 
-    private var _selectedInputStreamDataSourcePayload: MutableStateFlow<InputStreamDataSourcePayload?> =
-        MutableStateFlow(null)
-    val selectedInputStreamDataSourcePayload: StateFlow<InputStreamDataSourcePayload?> =
-        _selectedInputStreamDataSourcePayload
+    fun saveLastPlayedMediaToRecents(thumbnailFilePath: String, progress: Long) {
+        _currentMediaFile.value?.let { media ->
+            recentMediaService.addRecentMedia(
+                RecentMedia(
+                    mediaSourceType = media.type,
+                    file = media,
+                    thumbnailPath = thumbnailFilePath,
+                    thumbnailUrl = null,
+                    progress = progress,
+                )
+            )
+        }
+    }
 
-    init {
-        _selectedInputStreamDataSourceFile.observeForever {
-            it?.let {
-                launch {
-                    val mediaSourceFile = mediaSourceService.getFile(it)
-                    _selectedInputStreamDataSourcePayload.value = mediaSourceFile
+    fun setFileToPlay(fileToPlay: MediaSourceFile) {
+        if(_currentMediaFile.value == fileToPlay) return
+        _currentMediaFile.value = fileToPlay
+
+        launch {
+            when (fileToPlay.type) {
+                MediaSourceType.URL -> {
+                    _url.value = fileToPlay.path
+                }
+
+                else -> {
+                    val mediaSourceService = mediaSourceServiceFactory.getOrCreate(fileToPlay.type)
+                    val payload = mediaSourceService.getFile(fileToPlay.fullPath)
+                    _payload.value = payload
                 }
             }
         }
     }
 
-    fun clearSelectedMedia() {
-        savedStateService.clearSelectedMedia()
-        savedStateService.clearSelectedInputStreamDataSourceFileName()
-        _selectedInputStreamDataSourcePayload.value = null
-    }
-
-    fun saveLastPlayedMediaToRecents(thumbnailFilePath: String, progress: Long) {
-        selectedMedia.value?.let { media ->
-            media.type?.let { type ->
-                recentMediaService.addRecentMedia(
-                    RecentMedia(
-                        mediaSourceType = type,
-                        file = media,
-                        thumbnailPath = thumbnailFilePath,
-                        thumbnailUrl = null,
-                        progress = progress,
-                    )
-                )
-            }
-        }
+    fun clearFileToPlay() {
+        _currentMediaFile.value = null
+        _url.value = null
+        _payload.value = null
     }
 }
