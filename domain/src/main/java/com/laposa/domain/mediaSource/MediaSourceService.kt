@@ -100,10 +100,10 @@ class MediaSourceService(
     suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         remember: Boolean,
-    ) {
+    ): Boolean {
         _currentMediaProvider = getMediaProvider(mediaSource)
 
-        when {
+        return when {
             mediaSource.type.isZeroConf -> {
                 connectToZeroConfMediaSource(
                     mediaSource,
@@ -111,7 +111,9 @@ class MediaSourceService(
                 )
             }
 
-            else -> {}
+            else -> {
+                false
+            }
         }
     }
 
@@ -152,7 +154,7 @@ class MediaSourceService(
     private suspend fun connectToZeroConfMediaSource(
         mediaSource: MediaSource,
         remember: Boolean,
-    ) {
+    ) : Boolean {
         val result = _currentMediaProvider?.connectToMediaSource(
             mediaSource, remember
         ) == true
@@ -160,6 +162,8 @@ class MediaSourceService(
         if (result) {
             markMediaSourceAsConnected(mediaSource)
         }
+
+        return result
     }
 
     private fun markMediaSourceAsConnected(mediaSource: MediaSource) {

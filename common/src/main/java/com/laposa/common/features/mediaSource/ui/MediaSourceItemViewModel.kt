@@ -111,13 +111,16 @@ class MediaSourceItemViewModel(
         password: String? = null,
         remember: Boolean,
     ) {
-        mediaSourceService.connectToMediaSource(
+        val result = mediaSourceService.connectToMediaSource(
             mediaSource.copy(
                 username = userName,
                 password = password
             ), remember
         )
-        onConnectionSuccess()
+
+        if (result) {
+            onConnectionSuccess()
+        }
     }
 
     private suspend fun onConnectionSuccess() {
