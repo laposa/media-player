@@ -31,6 +31,10 @@ fun ZeroConfContent(
         mutableStateOf<List<MediaSource>?>(null)
     }
 
+    var mediaSourcesWithoutSaved by remember {
+        mutableStateOf<List<MediaSource>>(listOf())
+    }
+
     var content by remember {
         mutableStateOf<(@Composable () -> Unit)?>(null)
     }
@@ -38,6 +42,10 @@ fun ZeroConfContent(
     LaunchedEffect(true) {
         viewModel.fetchMediaSources()
         savedMediaSources = viewModel.getSavedMediaSources()
+    }
+
+    LaunchedEffect(mediaSources, savedMediaSources) {
+        mediaSourcesWithoutSaved = mediaSources - savedMediaSources.orEmpty().toSet()
     }
 
     fun setContent(newContent: @Composable () -> Unit) {
@@ -68,7 +76,7 @@ fun ZeroConfContent(
                     navigateToPlayer = homeNavigation::navigateToPlayer
                 )
             }
-            itemsIndexed(mediaSources.sortedBy { it.type.toString() + it.displayName }) { index, source ->
+            itemsIndexed(mediaSourcesWithoutSaved.sortedBy { it.type.toString() + it.displayName }) { index, source ->
                 MediaSourceItem(
                     mediaSource = source,
                     setScreenContent = ::setContent,

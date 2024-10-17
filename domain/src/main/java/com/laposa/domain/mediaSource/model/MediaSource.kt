@@ -43,6 +43,19 @@ data class MediaSource(
             )
         }
     }
+
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is MediaSource) {
+            key == other.key
+        } else {
+            false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return key.hashCode()
+    }
 }
 
 enum class MediaSourceType {
