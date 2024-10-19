@@ -4,6 +4,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.tv.material3.MaterialTheme
 
 @Immutable
 object ComponentsTheme {
@@ -19,6 +20,7 @@ object ComponentsTheme {
         errorTextColor = Color.White,
         errorLabelColor = Color.Red,
         focusedIndicatorColor = Color.White,
+        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
         cursorColor = Color.White,
     )
 }

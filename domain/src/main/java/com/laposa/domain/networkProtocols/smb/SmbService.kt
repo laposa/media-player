@@ -15,6 +15,8 @@ import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceShare
 import com.laposa.domain.mediaSource.model.MediaSourceType
+import com.laposa.domain.networkProtocols.AuthFailException
+import com.laposa.domain.networkProtocols.ConnectionFailedException
 import com.laposa.domain.networkProtocols.mediaFileExtensionsList
 import com.rapid7.client.dcerpc.mssrvs.ServerService
 import com.rapid7.client.dcerpc.transport.SMBTransportFactories
@@ -67,8 +69,11 @@ class SmbService {
 
             return@withContext true
         } catch (e: Exception) {
-            if (e.message?.contains("STATUS_LOGON_FAILURE") == true && userName != null) {
-                throw WrongCredentialsException()
+            println(e)
+            if ((e.message?.contains("STATUS_LOGON_FAILURE") == true || e.message?.contains("STATUS_ACCESS_DENIED") == true) && userName != null) {
+                throw AuthFailException()
+            } else {
+                throw ConnectionFailedException()
             }
 
             return@withContext false

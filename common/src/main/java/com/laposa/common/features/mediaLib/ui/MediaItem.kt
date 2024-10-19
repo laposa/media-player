@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -26,12 +25,12 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import ie.laposa.common.R
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceGoUp
 import com.laposa.domain.mediaSource.model.MediaSourceShare
+import ie.laposa.common.R
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -69,11 +68,10 @@ fun MediaItem(
 
                     if (media is MediaSourceFile) {
                         if (media.thumbnailUrl != null) {
-
                             GlideImage(
                                 model = media.thumbnailUrl,
                                 contentDescription = media.name,
-                                contentScale = ContentScale.None,
+                                contentScale = ContentScale.Crop,
                             )
                         } else {
                             Icon(
@@ -94,7 +92,7 @@ fun MediaItem(
                     if (subTitle != null) {
                         Text(
                             subTitle,
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
@@ -107,7 +105,7 @@ fun MediaItem(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

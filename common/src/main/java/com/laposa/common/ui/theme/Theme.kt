@@ -21,6 +21,7 @@ fun LaposaVideoPlayerTheme(
     } else {
         light(GreenSeedColor.toArgb())
     }
+
     MaterialTheme(
         colorScheme = colorScheme.toColorScheme(),
         typography = Typography,

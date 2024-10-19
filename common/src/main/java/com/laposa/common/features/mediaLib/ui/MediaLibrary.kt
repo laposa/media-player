@@ -1,6 +1,5 @@
 package com.laposa.common.features.mediaLib.ui
 
-import android.widget.Space
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,24 +12,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
+import com.laposa.domain.mediaSource.model.MediaSourceGoUp
 import com.laposa.domain.mediaSource.model.MediaSourceShare
 import kotlinx.coroutines.flow.StateFlow
-import com.laposa.domain.mediaSource.model.MediaSourceGoUp
 
 @Composable
 fun MediaLibrary(
@@ -113,7 +104,11 @@ private fun MediaLibraryInner(
     }
 
     Column {
-        Text(getCurrentTitle(), style = MaterialTheme.typography.titleLarge, color = Color.White)
+        Text(
+            getCurrentTitle(),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),

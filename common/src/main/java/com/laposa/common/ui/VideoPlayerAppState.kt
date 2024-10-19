@@ -1,5 +1,6 @@
 package com.laposa.common.ui
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
@@ -19,6 +20,11 @@ fun rememberVideoPlayerAppState(
     navHostController: NavHostController = rememberNavController(),
 ) = remember(navHostController) {
     VideoPlayerAppState(navHostController)
+}
+
+@Composable
+fun rememberSnackbarHostState() = remember {
+    SnackbarHostState()
 }
 
 sealed interface Screen {

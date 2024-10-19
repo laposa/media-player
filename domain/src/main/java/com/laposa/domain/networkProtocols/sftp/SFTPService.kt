@@ -9,6 +9,8 @@ import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceType
+import com.laposa.domain.networkProtocols.AuthFailException
+import com.laposa.domain.networkProtocols.ConnectionFailedException
 import com.laposa.domain.networkProtocols.mediaFileExtensionsList
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import kotlinx.coroutines.Dispatchers
@@ -28,14 +30,17 @@ class SFTPService {
         try {
             session = jsch.getSession(user, host, port)
             session?.setPassword(password)
+            session?.timeout = 5000
             session?.setConfig("StrictHostKeyChecking", "no")
             session?.connect()
             openChannel()
 
             println("Connected to $host:$port as $user")
         } catch (exception: Exception) {
-            Log.e(TAG, exception.message ?: "Unknown error")
-            return@withContext false
+            when {
+                exception.message?.contains("Auth fail") == true -> throw AuthFailException()
+                else -> throw ConnectionFailedException()
+            }
         }
 
         return@withContext true

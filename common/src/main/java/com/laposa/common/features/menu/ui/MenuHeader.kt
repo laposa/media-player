@@ -11,13 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import ie.laposa.common.R
+import androidx.tv.material3.MaterialTheme
 import com.laposa.common.theme.VideoPlayerTypography
+import ie.laposa.common.R
 
 @Composable
 fun Header() {
@@ -31,12 +31,12 @@ fun Header() {
         Icon(
             painterResource(R.drawable.video_player_icon),
             contentDescription = "Video Player",
-            tint = Color.White
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             "LAPOSA PLAYER",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = VideoPlayerTypography.headlineSmall.copy(
                 fontSize = TextUnit(
                     18f,

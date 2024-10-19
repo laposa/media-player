@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -27,12 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Border
+import androidx.tv.material3.Card
+import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Icon
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.MaterialTheme.colorScheme
 import androidx.tv.material3.Text
-import com.laposa.common.theme.onSurfaceDark
-import com.laposa.common.theme.surfaceDark
 import ie.laposa.common.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,9 +42,9 @@ fun <T> SelectDialog(
     title: String,
     getOptionTitle: (T) -> String,
     options: List<T>,
+    focusRequester: FocusRequester? = null,
     onOptionSelected: (T) -> Unit,
 ) {
-    val focusRequester = FocusRequester()
     val connectionTypeDialogFocusRequester = FocusRequester()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -53,20 +53,33 @@ fun <T> SelectDialog(
     LaunchedEffect(isDialogVisible) {
         if (isDialogVisible) {
             connectionTypeDialogFocusRequester.requestFocus()
-        } else {
-            focusRequester.requestFocus()
         }
     }
 
     Card(
-        modifier = Modifier
-            .height(70.dp)
-            .focusRequester(focusRequester),
-        onClick = { isDialogVisible = true },
-        colors = CardDefaults.cardColors().copy(
-            containerColor = surfaceDark,
+        modifier = focusRequester?.let {
+            Modifier
+                .height(70.dp).focusRequester(it)
+        } ?: Modifier.height(70.dp),
+        colors = CardDefaults.colors(
+            containerColor = Color.Transparent,
         ),
-        border = BorderStroke(1.dp, onSurfaceDark)
+        onClick = { isDialogVisible = true },
+        border = CardDefaults.border(
+            border = Border(
+                border = BorderStroke(
+                    1.dp,
+                    colorScheme.border
+                )
+            ),
+            focusedBorder = Border(
+                border = BorderStroke(
+                    2.dp,
+                    Color.White,
+                )
+            )
+        ),
+        scale = CardDefaults.scale(focusedScale = 1.025f),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -75,13 +88,17 @@ fun <T> SelectDialog(
                 .padding(16.dp)
         ) {
             Column {
-                Text(text = title, color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = title,
+                    color = colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = getOptionTitle(value),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Start,
-                    color = Color.White
+                    color = colorScheme.onSurfaceVariant
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -97,7 +114,8 @@ fun <T> SelectDialog(
 
     ModalBottomSheet(
         onDismissRequest = { isDialogVisible = false },
-        containerColor = surfaceDark,
+        containerColor = colorScheme.surfaceVariant,
+
         sheetState = sheetState
     ) {
         Column(modifier = Modifier.padding(32.dp)) {

@@ -5,7 +5,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.laposa.common.features.home.ui.Home
-import com.laposa.common.features.player.ui.PlayerScreen
 
 @Composable
 fun VideoPlayerApp(appState: VideoPlayerAppState = rememberVideoPlayerAppState()) {

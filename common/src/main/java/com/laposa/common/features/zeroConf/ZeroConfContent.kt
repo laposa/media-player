@@ -26,6 +26,11 @@ fun ZeroConfContent(
     val mediaSources = viewModel.mediaSources.collectAsState().value
     val mediaSourceItemViewModelFactory = LocalMediaSourceItemViewModelFactory.current
     val homeNavigation = LocalHomeNavigation.current
+    val isLoading = viewModel.isLoading.collectAsState().value
+
+    LaunchedEffect(isLoading) {
+        println("In ZeroConfContent - isLoading: $isLoading")
+    }
 
     var savedMediaSources by remember {
         mutableStateOf<List<MediaSource>?>(null)
@@ -62,7 +67,11 @@ fun ZeroConfContent(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                ManualMediaSourceItem(::setContent, homeNavigation::navigateToZeroConf)
+                ManualMediaSourceItem(
+                    ::setContent,
+                    homeNavigation::navigateToZeroConf,
+                    viewModel,
+                )
             }
             itemsIndexed(savedMediaSources ?: emptyList()) { index, source ->
                 MediaSourceItem(

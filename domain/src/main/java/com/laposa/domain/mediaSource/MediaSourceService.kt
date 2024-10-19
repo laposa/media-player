@@ -12,7 +12,6 @@ import com.laposa.domain.savedState.SavedStateService
 import com.laposa.domain.zeroConf.ZeroConfService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 
 class MediaSourceService(
     private val provider: MediaSourceProvider,
@@ -78,7 +77,6 @@ class MediaSourceService(
     }
 
 
-
     suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         remember: Boolean,
@@ -141,6 +139,7 @@ class MediaSourceServiceFactory(
     private val sftpMediaProvider: SftpMediaProvider,
 ) {
     private var instances: MutableMap<String, MediaSourceService> = mutableMapOf()
+
     init {
         instances = savedStateHandle[INSTANCES_MAP_KEY] ?: mutableMapOf()
     }

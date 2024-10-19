@@ -14,17 +14,22 @@ class ZeroConfContentViewModel @Inject constructor(
     private val savedStateService: SavedStateService,
     private val mediaSourceServiceFactory: MediaSourceServiceFactory,
 ) : ViewModelBase() {
+
     val mediaSources = zeroConfService.mediaSources
+
     fun getSavedMediaSources(): List<MediaSource> {
         return savedStateService.getSavedMediaSources()
     }
 
-    fun addAndConnectMediaSource(mediaSource: MediaSource) {
+    suspend fun addAndConnectMediaSource(mediaSource: MediaSource): String? {
         println("Adding and connecting media source: $mediaSource")
-        launch {
-            val mediaSourceService = mediaSourceServiceFactory.getOrCreate(mediaSource.type)
+        val mediaSourceService = mediaSourceServiceFactory.getOrCreate(mediaSource.type)
+        try {
             mediaSourceService.addAndConnectManualMediaSource(mediaSource)
+        } catch (e: Exception) {
+            return e.message
         }
+        return null
     }
 
     fun fetchMediaSources() {
