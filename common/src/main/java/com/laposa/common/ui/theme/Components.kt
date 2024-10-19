@@ -12,15 +12,15 @@ object ComponentsTheme {
     fun textInputColors() = TextFieldDefaults.colors().copy(
         unfocusedContainerColor = Color.Transparent,
         focusedContainerColor = Color.Transparent,
-        unfocusedTextColor = Color.White,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         focusedTextColor = Color.White,
-        focusedLabelColor = Color.White,
-        unfocusedLabelColor = Color.White,
+        focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
         errorContainerColor = Color.Transparent,
         errorTextColor = Color.White,
         errorLabelColor = Color.Red,
         focusedIndicatorColor = Color.White,
         unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        cursorColor = Color.White,
+        cursorColor = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }

@@ -36,6 +36,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
+import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.laposa.common.features.common.composables.FocusableForm
 import com.laposa.common.features.common.composables.LoadingModal
@@ -119,9 +120,10 @@ fun AddConnectionDialog(
             modifier = Modifier
                 .width(500.dp).align(Alignment.Center),
             shape = RoundedCornerShape(12.dp),
-
-
-            ) {
+            colors = SurfaceDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+        ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -132,11 +134,12 @@ fun AddConnectionDialog(
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
                 FocusableForm(scrollState, components = listOf(
-                    { focusRequester, focusNext ->
+                    { _, focusNext ->
                         TextField(
                             value = name,
                             onValueChange = { name = it },
