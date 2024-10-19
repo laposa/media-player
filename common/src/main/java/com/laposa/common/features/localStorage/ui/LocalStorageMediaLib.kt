@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastMap
-import com.laposa.common.features.common.screens.EmptyListScreen
 import com.laposa.common.features.mediaLib.ui.MediaLibrary
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
@@ -41,20 +40,18 @@ fun LocalStorageMediaLib(
         currentPath = File(currentPath).parent ?: rootPath
     }
 
-    if (currentFiles.keys.isNotEmpty()) {
-        MediaLibrary(
-            title = "Local Storage",
-            files = currentFiles.keys.toList(),
-            path = currentPath,
-            defaultPathDepthLevel = rootPath.split("/").size + 1,
-            onMediaFileSelect = ::onFileSelect,
-            onMediaDirectorySelect = ::onDirectorySelect,
-            onMediaShareSelect = ::onShareSelect,
-            onGoUp = ::onGoUp
-        )
-    } else {
-        EmptyListScreen()
-    }
+    MediaLibrary(
+        title = "Local Storage",
+        files = currentFiles.keys.toList(),
+        columnBaseSize = 98,
+        path = currentPath,
+        defaultPathDepthLevel = rootPath.split("/").size + 1,
+        onMediaFileSelect = ::onFileSelect,
+        onMediaDirectorySelect = ::onDirectorySelect,
+        onMediaShareSelect = ::onShareSelect,
+        onGoUp = ::onGoUp
+    )
+
 }
 
 fun getFilesAndFolders(path: String): Map<MediaSourceFileBase, File> {

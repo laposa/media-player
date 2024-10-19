@@ -28,6 +28,7 @@ fun MediaLibrary(
     title: String,
     files: StateFlow<List<MediaSourceFileBase>>,
     path: String,
+    columnBaseSize: Int = 128,
     defaultPathDepthLevel: Int = 1,
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
@@ -40,6 +41,7 @@ fun MediaLibrary(
         title,
         currentFiles,
         path,
+        columnBaseSize,
         defaultPathDepthLevel,
         onMediaFileSelect,
         onMediaDirectorySelect,
@@ -53,6 +55,7 @@ fun MediaLibrary(
     title: String,
     files: List<MediaSourceFileBase>,
     path: String,
+    columnBaseSize: Int,
     defaultPathDepthLevel: Int = 1,
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
@@ -63,6 +66,7 @@ fun MediaLibrary(
         title,
         files,
         path,
+        columnBaseSize,
         defaultPathDepthLevel,
         onMediaFileSelect,
         onMediaDirectorySelect,
@@ -76,6 +80,7 @@ private fun MediaLibraryInner(
     title: String,
     files: List<MediaSourceFileBase>,
     path: String,
+    columnBaseSize: Int,
     defaultPathDepthLevel: Int = 1,
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
@@ -112,7 +117,7 @@ private fun MediaLibraryInner(
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Adaptive(128.dp),
+            columns = GridCells.Adaptive(columnBaseSize.dp),
             contentPadding = PaddingValues(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -122,7 +127,11 @@ private fun MediaLibraryInner(
                 val index = currentFiles.indexOf(mediaItem)
                 MediaItem(mediaItem, index) {
                     onMediaSelect(
-                        it, onMediaFileSelect, onMediaDirectorySelect, onMediaShareSelect, onGoUp
+                        it,
+                        onMediaFileSelect,
+                        onMediaDirectorySelect,
+                        onMediaShareSelect,
+                        onGoUp
                     )
                 }
             }

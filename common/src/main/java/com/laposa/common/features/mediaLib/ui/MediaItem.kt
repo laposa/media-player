@@ -102,7 +102,7 @@ fun MediaItem(
         Text(
             text = media.name,
             style = MaterialTheme.typography.bodyMedium,
-            maxLines = 2,
+            maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
             color = MaterialTheme.colorScheme.onSurfaceVariant

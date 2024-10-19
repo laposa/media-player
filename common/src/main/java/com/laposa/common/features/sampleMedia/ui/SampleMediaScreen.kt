@@ -34,6 +34,7 @@ fun SampleMediaScreen(
             "Samples",
             viewModel.media,
             "",
+            columnBaseSize = 128,
             1,
             ::onMediaSelected,
             ::onDirectorySelected,
