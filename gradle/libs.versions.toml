@@ -30,6 +30,7 @@ nfsClient = "1.1.0"
 appacheCommons = "2.9.0"
 gson = "2.11.0"
 jsch = "0.1.55"
+embrace-swazzler = "6.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,11 +69,11 @@ nfsClient = { group = "com.emc.ecs", name = "nfs-client", version.ref = "nfsClie
 vfs = { group = "org.apache.commons", name = "commons-vfs2", version.ref = "appacheCommons" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 jsch = { group = "com.jcraft", name = "jsch", version.ref = "jsch" }
-
+embrace-android-sdk = { group = "io.embrace", name = "embrace-android-sdk", version.ref = "embrace-swazzler" }
+embrace-swazzler = { group = "io.embrace", name = "embrace-swazzler", version.ref = "embrace-swazzler" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 hilt-android-gradle-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-

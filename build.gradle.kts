@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.hilt.android.gradle.plugin) apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
+    id("io.embrace.swazzler") version "6.13.0" apply false
 }
