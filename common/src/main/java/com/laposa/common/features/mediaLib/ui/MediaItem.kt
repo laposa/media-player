@@ -71,7 +71,7 @@ fun MediaItem(
                             GlideImage(
                                 model = media.thumbnailUrl,
                                 contentDescription = media.name,
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.FillWidth,
                             )
                         } else {
                             Icon(

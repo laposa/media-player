@@ -1,7 +1,6 @@
 package com.laposa.common.features.mediaSource.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import com.laposa.common.features.common.composables.LoadingModal
 import com.laposa.common.features.home.ui.LocalSnackbarHost
@@ -28,14 +27,6 @@ fun MediaSourceItem(
 
     val viewModel: MediaSourceItemViewModel = viewModelFactory.create(mediaSource)
     val isLoading = viewModel.isLoading.collectAsState().value
-    val connectionError = viewModel.connectionError.collectAsState().value
-
-    LaunchedEffect(connectionError) {
-        if (connectionError != null) {
-            snackbarHost.showSnackbar(message = connectionError)
-            viewModel.wipeConnectionError()
-        }
-    }
 
     fun playFile(mediaItem: MediaSourceFile) {
         viewModel.launch {
@@ -50,6 +41,16 @@ fun MediaSourceItem(
     fun openShare(share: String) {
         viewModel.launch {
             viewModel.onSambaShareSelected(share)
+        }
+    }
+
+    fun onAuthFailed() {
+        viewModel.showLoginDialog()
+    }
+
+    fun onConnectionFailed(message: String) {
+        viewModel.launch {
+            snackbarHost.showSnackbar(message = message)
         }
     }
 
@@ -79,7 +80,11 @@ fun MediaSourceItem(
                         viewModel.onLoginSubmit(userName, password, remember)
                     }
                 } else {
-                    MediaSourceNotConnected(mediaSource.displayName) {
+                    MediaSourceNotConnected(
+                        mediaSource.displayName,
+                        onAuthFail = ::onAuthFailed,
+                        onConnectionFail = ::onConnectionFailed
+                    ) {
                         viewModel.connectToMediaSource()
                     }
                 }
