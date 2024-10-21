@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun FocusableForm(
     scrollState: ScrollState,
-    components: List<@Composable (focusRequester: SafeFocusRequester, focusNext: () -> Unit) -> Unit>
+    components: List<@Composable (focusRequester: SafeFocusRequester, focusNext: () -> Unit) -> Unit>,
 ) {
     // Create a list of FocusRequester
     val focusRequesters = remember { List(components.size) { SafeFocusRequester() } }
@@ -55,5 +55,9 @@ class SafeFocusRequester {
 
     fun requestFocus() {
         focusRequester.requestFocus()
+    }
+
+    fun reset() {
+        _isInitialized = false
     }
 }
