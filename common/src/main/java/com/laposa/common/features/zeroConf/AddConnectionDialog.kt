@@ -15,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,12 +39,19 @@ import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.laposa.common.features.common.composables.FocusableForm
 import com.laposa.common.features.common.composables.LoadingModal
+import com.laposa.common.features.common.composables.MyTextField
 import com.laposa.common.features.common.composables.selectDialog.SelectDialog
 import com.laposa.common.features.home.ui.LocalSnackbarHost
 import com.laposa.common.ui.theme.ComponentsTheme
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceType
 import kotlinx.coroutines.launch
+
+
+val mediaTypeSettings = mapOf(
+    MediaSourceType.SFTP to listOf("connectionName", "hostName", "port", "userName", "password"),
+    MediaSourceType.SMB to listOf("connectionName", "hostName", "userName", "password"),
+)
 
 @Composable
 fun AddConnectionDialog(
@@ -94,6 +100,14 @@ fun AddConnectionDialog(
         mutableStateOf<String>("22")
     }
 
+    var currentSettings by remember {
+        mutableStateOf(mediaTypeSettings[connectionType] ?: emptyList())
+    }
+
+    LaunchedEffect(connectionType) {
+        currentSettings = mediaTypeSettings[connectionType] ?: emptyList()
+    }
+
     fun addAndConnect() {
         onSubmit(
             MediaSource(
@@ -118,7 +132,8 @@ fun AddConnectionDialog(
     ) {
         Surface(
             modifier = Modifier
-                .width(500.dp).align(Alignment.Center),
+                .width(500.dp)
+                .align(Alignment.Center),
             shape = RoundedCornerShape(12.dp),
             colors = SurfaceDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -136,32 +151,16 @@ fun AddConnectionDialog(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
                 FocusableForm(scrollState, components = listOf(
-                    { _, focusNext ->
-                        TextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            placeholder = { Text("My Home Server") },
-                            label = { Text("Connection Name") },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ComponentsTheme.textInputColors(),
-                            modifier = Modifier.focusRequester(initialFocusRequester),
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(onNext = { focusNext() })
-                        )
-                    },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
-                    { focusRequester, focusNext ->
+                    { _, focusNext ->
                         SelectDialog(
                             value = connectionType,
                             title = "Connection Type",
                             getOptionTitle = { it.name },
-                            options = MediaSourceType.entries,
-                            focusRequester = focusRequester.focusRequester,
+                            options = listOf(MediaSourceType.SFTP, MediaSourceType.SMB),
+                            focusRequester = initialFocusRequester,
                         ) {
                             connectionType = it
                             focusNext()
@@ -169,7 +168,25 @@ fun AddConnectionDialog(
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
                     { focusRequester, focusNext ->
-                        TextField(
+                        MyTextField(
+                            visible = currentSettings.contains("connectionName"),
+                            value = name,
+                            onValueChange = { name = it },
+                            placeholder = { Text("My Home Server") },
+                            label = { Text("Connection Name") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ComponentsTheme.textInputColors(),
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(onNext = { focusNext() }),
+                            safeFocusRequester = focusRequester,
+                        )
+                    },
+                    { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
+                    { focusRequester, focusNext ->
+                        MyTextField(
+                            visible = currentSettings.contains("hostName"),
                             value = hostName,
                             onValueChange = { hostName = it },
                             placeholder = { Text("0.0.0.0") },
@@ -181,30 +198,33 @@ fun AddConnectionDialog(
                                 imeAction = ImeAction.Next
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
-                            modifier = Modifier.focusRequester(focusRequester.focusRequester),
+                            safeFocusRequester = focusRequester,
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
                     { focusRequester, focusNext ->
-                        TextField(
+                        MyTextField(
+                            visible = currentSettings.contains("port"),
                             value = port,
                             onValueChange = { port = it },
                             placeholder = { Text("22") },
                             label = { Text("Port") },
                             colors = ComponentsTheme.textInputColors(),
                             shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.width(100.dp)
-                                .focusRequester(focusRequester.focusRequester),
+                            modifier = Modifier
+                                .width(100.dp),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Next
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
+                            safeFocusRequester = focusRequester,
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
                     { focusRequester, focusNext ->
-                        TextField(
+                        MyTextField(
+                            visible = currentSettings.contains("userName"),
                             value = userName,
                             onValueChange = { userName = it },
                             label = { Text("User name") },
@@ -215,12 +235,13 @@ fun AddConnectionDialog(
                                 imeAction = ImeAction.Next
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
-                            modifier = Modifier.focusRequester(focusRequester.focusRequester),
+                            safeFocusRequester = focusRequester,
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
                     { focusRequester, focusNext ->
-                        TextField(
+                        MyTextField(
+                            visible = currentSettings.contains("password"),
                             value = password,
                             onValueChange = { password = it },
                             label = { Text("Password") },
@@ -231,7 +252,7 @@ fun AddConnectionDialog(
                                 imeAction = ImeAction.Next
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
-                            modifier = Modifier.focusRequester(focusRequester.focusRequester),
+                            safeFocusRequester = focusRequester,
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(32.dp)) },
@@ -272,6 +293,6 @@ fun AddConnectionDialog(
             }
             LoadingModal(isLoading)
         }
-
     }
 }
+

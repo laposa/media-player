@@ -28,7 +28,7 @@ fun LaposaVideoPlayerTheme(
         PurpleSeedColor,
     )
 
-    val color = colors.random()
+    val color = BlueSeedColor
     val colorScheme = if (isInDarkTheme) {
         dark(color.toArgb())
     } else {
