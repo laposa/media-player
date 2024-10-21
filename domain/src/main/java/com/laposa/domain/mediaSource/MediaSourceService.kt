@@ -103,7 +103,7 @@ class MediaSourceService(
 
             markMediaSourceAsConnected(mediaSource)
             return@let true
-        } ?: false
+        }
     }
 
     private suspend fun connectToZeroConfMediaSource(

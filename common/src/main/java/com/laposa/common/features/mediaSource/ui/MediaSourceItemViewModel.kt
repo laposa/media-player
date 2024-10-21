@@ -56,7 +56,7 @@ class MediaSourceItemViewModel(
         _files.value = files
     }
 
-    private fun showLoginDialog() {
+    fun showLoginDialog() {
         _loginDialogError.value = null
         _isLoginViewModelVisible.value = true
     }
@@ -65,13 +65,11 @@ class MediaSourceItemViewModel(
         _isLoginViewModelVisible.value = false
     }
 
-    fun connectToMediaSource() {
-        launch {
-            if (!mediaSourceService.tryToConnectToMediaSource(selectedMediaSource)) {
-                showLoginDialog()
-            } else {
-                onConnectionSuccess()
-            }
+    suspend fun connectToMediaSource() {
+        if (!mediaSourceService.tryToConnectToMediaSource(selectedMediaSource)) {
+            showLoginDialog()
+        } else {
+            onConnectionSuccess()
         }
     }
 

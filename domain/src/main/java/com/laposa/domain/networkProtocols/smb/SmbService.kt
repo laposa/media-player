@@ -70,13 +70,11 @@ class SmbService {
             return@withContext true
         } catch (e: Exception) {
             println(e)
-            if ((e.message?.contains("STATUS_LOGON_FAILURE") == true || e.message?.contains("STATUS_ACCESS_DENIED") == true) && userName != null) {
+            if ((e.message?.contains("STATUS_LOGON_FAILURE") == true || e.message?.contains("STATUS_ACCESS_DENIED") == true)) {
                 throw AuthFailException()
             } else {
                 throw ConnectionFailedException()
             }
-
-            return@withContext false
         }
     }
 

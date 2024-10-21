@@ -2,6 +2,8 @@ package com.laposa.common.features.mediaSource.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import com.laposa.common.features.common.composables.LoadingModal
+import com.laposa.common.features.home.ui.LocalSnackbarHost
 import com.laposa.common.features.home.ui.content.MediaSourceNotConnected
 import com.laposa.common.features.mediaLib.ui.MediaLibrary
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
@@ -21,6 +23,8 @@ fun MediaSourceItem(
     index: Int,
 ) {
 
+    val snackbarHost = LocalSnackbarHost.current
+
     val viewModel: MediaSourceItemViewModel = viewModelFactory.create(mediaSource)
     val isLoading = viewModel.isLoading.collectAsState().value
 
@@ -37,6 +41,16 @@ fun MediaSourceItem(
     fun openShare(share: String) {
         viewModel.launch {
             viewModel.onSambaShareSelected(share)
+        }
+    }
+
+    fun onAuthFailed() {
+        viewModel.showLoginDialog()
+    }
+
+    fun onConnectionFailed(message: String) {
+        viewModel.launch {
+            snackbarHost.showSnackbar(message = message)
         }
     }
 
@@ -66,7 +80,11 @@ fun MediaSourceItem(
                         viewModel.onLoginSubmit(userName, password, remember)
                     }
                 } else {
-                    MediaSourceNotConnected(mediaSource.displayName) {
+                    MediaSourceNotConnected(
+                        mediaSource.displayName,
+                        onAuthFail = ::onAuthFailed,
+                        onConnectionFail = ::onConnectionFailed
+                    ) {
                         viewModel.connectToMediaSource()
                     }
                 }
@@ -81,4 +99,6 @@ fun MediaSourceItem(
         icon = R.drawable.smb_share,
         onClick = { onMediaSourceSelected(mediaSource) },
     )
+
+    LoadingModal(isLoading)
 }
