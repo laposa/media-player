@@ -1,7 +1,10 @@
 package com.laposa.common.features.mediaSource.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import com.laposa.common.features.common.composables.LoadingModal
+import com.laposa.common.features.home.ui.LocalSnackbarHost
 import com.laposa.common.features.home.ui.content.MediaSourceNotConnected
 import com.laposa.common.features.mediaLib.ui.MediaLibrary
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
@@ -21,8 +24,18 @@ fun MediaSourceItem(
     index: Int,
 ) {
 
+    val snackbarHost = LocalSnackbarHost.current
+
     val viewModel: MediaSourceItemViewModel = viewModelFactory.create(mediaSource)
     val isLoading = viewModel.isLoading.collectAsState().value
+    val connectionError = viewModel.connectionError.collectAsState().value
+
+    LaunchedEffect(connectionError) {
+        if (connectionError != null) {
+            snackbarHost.showSnackbar(message = connectionError)
+            viewModel.wipeConnectionError()
+        }
+    }
 
     fun playFile(mediaItem: MediaSourceFile) {
         viewModel.launch {
@@ -81,4 +94,6 @@ fun MediaSourceItem(
         icon = R.drawable.smb_share,
         onClick = { onMediaSourceSelected(mediaSource) },
     )
+
+    LoadingModal(isLoading)
 }

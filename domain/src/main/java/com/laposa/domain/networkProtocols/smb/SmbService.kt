@@ -75,8 +75,6 @@ class SmbService {
             } else {
                 throw ConnectionFailedException()
             }
-
-            return@withContext false
         }
     }
 

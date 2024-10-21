@@ -36,6 +36,9 @@ class MediaSourceItemViewModel(
     private val _isConnected: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected
 
+    private val _connectionError: MutableStateFlow<String?> = MutableStateFlow(null)
+    val connectionError: StateFlow<String?> = _connectionError
+
     fun openDirectory(directory: MediaSourceDirectory) {
         launch {
             val files =
@@ -67,12 +70,20 @@ class MediaSourceItemViewModel(
 
     fun connectToMediaSource() {
         launch {
-            if (!mediaSourceService.tryToConnectToMediaSource(selectedMediaSource)) {
-                showLoginDialog()
-            } else {
-                onConnectionSuccess()
+            try {
+                if (!mediaSourceService.tryToConnectToMediaSource(selectedMediaSource)) {
+                    showLoginDialog()
+                } else {
+                    onConnectionSuccess()
+                }
+            } catch (e: Exception) {
+                _connectionError.value = e.message
             }
         }
+    }
+
+    fun wipeConnectionError() {
+        _connectionError.value = null
     }
 
     fun onLoginSubmit(userName: String?, password: String?, remember: Boolean) {
