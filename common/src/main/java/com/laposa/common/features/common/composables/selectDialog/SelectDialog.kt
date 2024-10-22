@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,10 +58,11 @@ fun <T> SelectDialog(
     }
 
     Card(
-        modifier = focusRequester?.let {
+        modifier = (focusRequester?.let {
             Modifier
-                .height(70.dp).focusRequester(it)
-        } ?: Modifier.height(70.dp),
+                .height(70.dp)
+                .focusRequester(it)
+        } ?: Modifier.height(70.dp)).testTag("select_dialog_$title"),
         colors = CardDefaults.colors(
             containerColor = Color.Transparent,
         ),
