@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -261,7 +262,9 @@ fun AddConnectionDialog(
                         Row {
                             Button(
                                 onClick = ::addAndConnect,
-                                modifier = Modifier.focusRequester(focusRequester.focusRequester),
+                                modifier = Modifier
+                                    .focusRequester(focusRequester.focusRequester)
+                                    .testTag("add_connection_button"),
                                 border = ButtonDefaults.border(
                                     border = Border(
                                         border = BorderStroke(
@@ -275,6 +278,7 @@ fun AddConnectionDialog(
                             }
                             Spacer(modifier = Modifier.weight(1f))
                             Button(
+                                modifier = Modifier.testTag("cancel_button"),
                                 onClick = onDismiss,
                                 border = ButtonDefaults.border(
                                     border = Border(

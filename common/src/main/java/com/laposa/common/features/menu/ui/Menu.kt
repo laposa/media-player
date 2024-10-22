@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -129,7 +130,9 @@ fun Menu() {
                                 section.title, maxLines = 1, overflow = TextOverflow.Ellipsis
                             )
                         },
-                        modifier = Modifier.focusRequester(if (rootIndex == 0) firstItemFocusRequester else FocusRequester())
+                        modifier = Modifier
+                            .focusRequester(if (rootIndex == 0) firstItemFocusRequester else FocusRequester())
+                            .testTag("menu_item_${section.title}"),
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -145,7 +148,7 @@ fun Menu() {
                     Text(
                         "Settings", maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
-                })
+                }, modifier = Modifier.testTag("menu_item_Settings"))
             }
 
         }) {

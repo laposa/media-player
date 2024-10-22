@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,6 +46,7 @@ fun MediaSourceItemContent(
                 .height(90.dp)
                 .width(150.dp)
                 .focusRequester(focusRequester)
+                .testTag("media_source_item_${title}_$type")
         ) {
             Box(
                 contentAlignment = Alignment.Center,

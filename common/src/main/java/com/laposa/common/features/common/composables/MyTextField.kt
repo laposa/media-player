@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 
@@ -65,7 +66,9 @@ fun MyTextField(
     TextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.focusRequester(focusRequester),
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .testTag("text_field_${label?.toString()}"),
         enabled = enabled,
         readOnly = readOnly,
         textStyle = textStyle,
