@@ -1,7 +1,11 @@
 package com.laposa.domain.mediaSource.model
 
 import android.net.nsd.NsdServiceInfo
+import android.os.Build
+import android.os.Bundle
 import android.os.Parcelable
+import androidx.annotation.RequiresApi
+import androidx.navigation.NavType
 import com.google.gson.Gson
 import com.laposa.domain.zeroConf.ZeroConfServiceType
 import kotlinx.parcelize.Parcelize
@@ -82,5 +86,19 @@ enum class MediaSourceType {
                 else -> throw IllegalArgumentException("Unknown media source type: $id")
             }
         }
+    }
+}
+
+class MediaSourceNavType : NavType<MediaSource>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): MediaSource? {
+        return bundle.getParcelable(key)
+    }
+
+    override fun parseValue(value: String): MediaSource {
+        return Gson().fromJson(value, MediaSource::class.java)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: MediaSource) {
+        bundle.putParcelable(key, value)
     }
 }

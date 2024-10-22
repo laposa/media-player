@@ -8,8 +8,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
@@ -42,16 +44,28 @@ fun MyTextField(
     colors: TextFieldColors = TextFieldDefaults.colors(),
     visible: Boolean = true,
     safeFocusRequester: SafeFocusRequester? = null,
+    focusedByDefault: Boolean = false,
 ) {
+
+    val focusRequester = remember {
+        safeFocusRequester?.focusRequester ?: FocusRequester()
+    }
+
     if (!visible) {
         safeFocusRequester?.reset()
         return
     }
 
+    LaunchedEffect(focusRequester) {
+        if (focusedByDefault) {
+            focusRequester.requestFocus()
+        }
+    }
+
     TextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = if (safeFocusRequester != null) modifier.focusRequester(safeFocusRequester.focusRequester) else modifier,
+        modifier = modifier.focusRequester(focusRequester),
         enabled = enabled,
         readOnly = readOnly,
         textStyle = textStyle,

@@ -53,50 +53,41 @@ fun ZeroConfContent(
         mediaSourcesWithoutSaved = mediaSources - savedMediaSources.orEmpty().toSet()
     }
 
-    fun setContent(newContent: @Composable () -> Unit) {
+    fun setContent(newContent: (@Composable () -> Unit)?) {
         content = newContent
     }
 
-    if (content != null) {
-        content!!()
-    } else {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(128.dp),
-            contentPadding = PaddingValues(top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                ManualMediaSourceItem(
-                    ::setContent,
-                    homeNavigation::navigateToZeroConf,
-                    viewModel,
-                )
-            }
-            itemsIndexed(savedMediaSources ?: emptyList()) { index, source ->
-                MediaSourceItem(
-                    mediaSource = source,
-                    setScreenContent = ::setContent,
-                    key = source.key,
-                    selectedKey = null,
-                    onSelected = {},
-                    viewModelFactory = mediaSourceItemViewModelFactory,
-                    index = index + 1,
-                    navigateToPlayer = homeNavigation::navigateToPlayer
-                )
-            }
-            itemsIndexed(mediaSourcesWithoutSaved.sortedBy { it.type.toString() + it.displayName }) { index, source ->
-                MediaSourceItem(
-                    mediaSource = source,
-                    setScreenContent = ::setContent,
-                    key = source.key,
-                    selectedKey = null,
-                    onSelected = {},
-                    viewModelFactory = mediaSourceItemViewModelFactory,
-                    index = index + 1,
-                    navigateToPlayer = homeNavigation::navigateToPlayer
-                )
-            }
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(128.dp),
+        contentPadding = PaddingValues(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            ManualMediaSourceItem(
+                ::setContent,
+                homeNavigation::navigateToZeroConf,
+                viewModel,
+            )
         }
+        itemsIndexed(savedMediaSources ?: emptyList()) { index, source ->
+            MediaSourceItem(
+                mediaSource = source,
+                key = source.key,
+                onSelected = {},
+                viewModelFactory = mediaSourceItemViewModelFactory,
+                index = index + 1,
+            )
+        }
+        itemsIndexed(mediaSourcesWithoutSaved.sortedBy { it.type.toString() + it.displayName }) { index, source ->
+            MediaSourceItem(
+                mediaSource = source,
+                key = source.key,
+                onSelected = {},
+                viewModelFactory = mediaSourceItemViewModelFactory,
+                index = index + 1,
+            )
+        }
+
     }
 }

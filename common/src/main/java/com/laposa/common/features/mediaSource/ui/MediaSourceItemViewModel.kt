@@ -65,11 +65,12 @@ class MediaSourceItemViewModel(
         _isLoginViewModelVisible.value = false
     }
 
-    suspend fun connectToMediaSource() {
+    suspend fun connectToMediaSource(): Boolean {
         if (!mediaSourceService.tryToConnectToMediaSource(selectedMediaSource)) {
-            showLoginDialog()
+            return false
         } else {
             onConnectionSuccess()
+            return true
         }
     }
 
@@ -95,6 +96,18 @@ class MediaSourceItemViewModel(
                 _isLoginViewModelVisible.value = false
             }
         }
+    }
+
+    suspend fun addAndConnectMediaSource(mediaSource: MediaSource): String? {
+        println("Adding and connecting media source: $mediaSource")
+        try {
+            mediaSourceService.addAndConnectManualMediaSource(mediaSource)
+            _files.value = mediaSourceService.getContentOfDirectoryAthPath("").second
+            _isConnected.value = true
+        } catch (e: Exception) {
+            return e.message
+        }
+        return null
     }
 
     fun onFileSelected(

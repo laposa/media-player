@@ -20,7 +20,6 @@ import java.io.InputStream
 const val TAG = "InputStreamDataSource"
 
 @OptIn(UnstableApi::class)
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class InputStreamDataSource(
     private val payload: InputStreamDataSourcePayload
 ) : BaseDataSource(true) {
@@ -81,7 +80,6 @@ class InputStreamDataSourceFactory @OptIn(UnstableApi::class) constructor(
     private val payload: InputStreamDataSourcePayload,
     private val context: Context,
 ) : DataSource.Factory {
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun createDataSource(): DataSource {
         val cache: SimpleCache = CacheUtil.getCache(context)
         val defaultDataSourceFactory = DataSource.Factory { InputStreamDataSource(payload) }

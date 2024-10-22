@@ -47,7 +47,6 @@ import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceType
 import kotlinx.coroutines.launch
 
-
 val mediaTypeSettings = mapOf(
     MediaSourceType.SFTP to listOf("connectionName", "hostName", "port", "userName", "password"),
     MediaSourceType.SMB to listOf("connectionName", "hostName", "userName", "password"),
@@ -57,17 +56,15 @@ val mediaTypeSettings = mapOf(
 fun AddConnectionDialog(
     onSubmit: (MediaSource) -> Unit,
     isLoading: Boolean = false,
-    error: String?,
+    error: String? = null,
+    defaultValues: Map<String, String>? = null,
+    defaultFocus: String = "connectionName",
     onDismiss: () -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHost.current
 
     val initialFocusRequester = FocusRequester()
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(false) {
-        initialFocusRequester.requestFocus()
-    }
 
     LaunchedEffect(error) {
         if (error != null) {
@@ -76,28 +73,26 @@ fun AddConnectionDialog(
             }
         }
     }
-
-    var connectionType by remember {
-        mutableStateOf(MediaSourceType.SFTP)
-    }
-
     val scrollState = rememberScrollState()
 
-    var name by remember {
-        mutableStateOf<String>("")
+    var connectionType by remember {
+        mutableStateOf(defaultValues?.get("connectionType")?.let { MediaSourceType.valueOf(it) }
+            ?: MediaSourceType.SFTP)
     }
-
+    var name by remember {
+        mutableStateOf<String>(defaultValues?.get("name") ?: "")
+    }
     var hostName by remember {
-        mutableStateOf<String>("192.168.31.226")
+        mutableStateOf<String>(defaultValues?.get("hostName") ?: "")
     }
     var userName by remember {
-        mutableStateOf<String>("laposa")
+        mutableStateOf<String>(defaultValues?.get("userName") ?: "")
     }
     var password by remember {
-        mutableStateOf<String>("Test1234")
+        mutableStateOf<String>(defaultValues?.get("password") ?: "")
     }
     var port by remember {
-        mutableStateOf<String>("22")
+        mutableStateOf<String>(defaultValues?.get("port") ?: "")
     }
 
     var currentSettings by remember {
@@ -109,12 +104,13 @@ fun AddConnectionDialog(
     }
 
     fun addAndConnect() {
+        println("Add and connect: $name, $hostName, $port, $userName, $password")
         onSubmit(
             MediaSource(
                 sourceName = connectionType.name,
                 displayName = name,
                 connectionAddress = hostName,
-                port = port.toInt(),
+                port = if (port != "" && port != "null") port.toInt() else null,
                 username = userName,
                 password = password,
                 type = connectionType
@@ -181,6 +177,7 @@ fun AddConnectionDialog(
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
                             safeFocusRequester = focusRequester,
+                            focusedByDefault = defaultFocus == "connectionName"
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
@@ -199,6 +196,7 @@ fun AddConnectionDialog(
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
                             safeFocusRequester = focusRequester,
+                            focusedByDefault = defaultFocus == "hostName"
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
@@ -219,6 +217,7 @@ fun AddConnectionDialog(
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
                             safeFocusRequester = focusRequester,
+                            focusedByDefault = defaultFocus == "port"
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
@@ -236,6 +235,7 @@ fun AddConnectionDialog(
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
                             safeFocusRequester = focusRequester,
+                            focusedByDefault = defaultFocus == "userName"
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(16.dp)) },
@@ -253,6 +253,7 @@ fun AddConnectionDialog(
                             ),
                             keyboardActions = KeyboardActions(onNext = { focusNext() }),
                             safeFocusRequester = focusRequester,
+                            focusedByDefault = defaultFocus == "password"
                         )
                     },
                     { _, _ -> Spacer(modifier = Modifier.height(32.dp)) },
