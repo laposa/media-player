@@ -1,5 +1,7 @@
 package com.laposa.common.features.home.ui.content
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -9,11 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.laposa.common.features.home.ui.HomeScreenViewModel
 import com.laposa.common.features.home.ui.LocalHomeNavigation
-import com.laposa.common.features.home.ui.ProvideHomeNavController
 import com.laposa.common.features.localStorage.ui.LocalStorageContent
-import com.laposa.common.features.player.ui.PlayerScreen
 import com.laposa.common.features.settings.ui.SettingsScreen
-import com.laposa.common.features.zeroConf.ZeroConfContent
+import com.laposa.common.features.zeroConf.ZeroConfScreen
 import com.laposa.common.ui.Screen
 
 @Composable
@@ -37,7 +37,7 @@ fun HomeContent(
         }
 
         composable(Screen.ZeroConf.route) {
-            ZeroConfContent()
+            ZeroConfScreen()
         }
 
         composable(Screen.Settings.route) {

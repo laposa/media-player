@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.view.KeyEvent
 import android.view.SurfaceView
+import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -80,19 +81,14 @@ fun PlayerView(
         }
     }
 
-    if (shouldDismiss) {
-        /*saveThumbnail?.let {
-            captureSurfaceView.drawToBitmap().let {
-                it(fileName, it, exoPlayer.currentPosition)
-            }
-        }*/
-        dismiss()
-    }
-
     DisposableEffect(Unit) {
         onDispose {
             exoPlayer.release()
         }
+    }
+
+    BackHandler {
+        dismiss()
     }
 
     Box {

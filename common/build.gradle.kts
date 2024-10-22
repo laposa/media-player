@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.javapoet)
     implementation(libs.glide)
     implementation(libs.androidx.compose.runtime.livedata)
+    implementation(libs.gson)
 
     implementation(project(":domain"))
 }
