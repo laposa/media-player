@@ -1,7 +1,5 @@
 package com.laposa.common.features.menu.ui
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
@@ -29,12 +29,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.tv.material3.DrawerValue
 import androidx.tv.material3.Icon
 import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
+import com.laposa.common.features.common.composables.getActivity
 import ie.laposa.common.R
 import com.laposa.common.features.home.ui.LocalHomeNavigation
 import com.laposa.common.features.home.ui.content.HomeContent
@@ -60,6 +62,7 @@ data class MenuItem(
 fun Menu() {
     val firstItemFocusRequester = FocusRequester()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
+    val activity = getActivity()
 
     var selectedIndex by remember { mutableIntStateOf(0) }
     val homeNavigation = LocalHomeNavigation.current
@@ -149,6 +152,19 @@ fun Menu() {
                         "Settings", maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }, modifier = Modifier.testTag("menu_item_Settings"))
+                NavigationDrawerItem(selected = selectedIndex == menuStructure.size + 1, onClick = {
+                    selectedIndex = menuStructure.size + 1
+                    activity?.finishAffinity()
+                }, leadingContent = {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ExitToApp,
+                        contentDescription = "Exit",
+                    )
+                }, content = {
+                    Text(
+                        "Exit", maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                })
             }
 
         }) {

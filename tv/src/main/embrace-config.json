@@ -1,5 +1,10 @@
 {
   "app_id": "V9rcJ",
   "api_token": "e0eb0d33ab54479da1910d0127ed5cc6",
-  "ndk_enabled": false
+  "ndk_enabled": false,
+  "sdk_config": {
+    "compose": {
+      "capture_compose_onclick": true
+    }
+  }
 }

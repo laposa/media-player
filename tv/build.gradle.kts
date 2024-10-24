@@ -9,6 +9,10 @@ plugins {
     id("io.embrace.swazzler")
 }
 
+swazzler {
+    disableComposeDependencyInjection.set(false)
+}
+
 android {
     namespace = "com.laposa.mediaplayer"
     compileSdk = 34
