@@ -1,2 +1,2 @@
-# video-player
-Something between Nplayer and Kodi for Fire TV and Apple TV
+# media-player
+Play media over local network on Android TV and Firestick.
