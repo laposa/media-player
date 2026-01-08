@@ -16,7 +16,7 @@ swazzler {
 
 android {
     namespace = "com.laposa.mediaplayer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.laposa.mediaplayer"
@@ -98,4 +98,9 @@ dependencies {
 
     implementation(project(":common"))
     implementation(project(":domain"))
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
