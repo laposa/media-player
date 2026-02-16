@@ -2,16 +2,23 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="mobile">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="tv">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-10-21T10:39:34.894783040Z">
+        <DropdownSelection timestamp="2026-02-16T14:42:01.362525Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator"
-                identifier="path=/home/frenkybojler/.android/avd/Television_1080p_API_34.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/frenkybojler/.android/avd/Television_720p.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="mobile">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2026-01-23T07:40:51.839766Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="Default" identifier="serial=192.168.0.73:5555;connection=bc50f048" />
             </handle>
           </Target>
         </DropdownSelection>

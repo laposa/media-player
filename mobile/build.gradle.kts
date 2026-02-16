@@ -9,11 +9,11 @@ plugins {
 
 android {
     namespace = "ie.laposa.video_player_android"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ie.laposa.video_player_android"
-        minSdk = 24
+        minSdk = 22
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

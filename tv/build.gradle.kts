@@ -7,20 +7,15 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("io.embrace.swazzler")
-}
-
-swazzler {
-    disableComposeDependencyInjection.set(false)
 }
 
 android {
     namespace = "com.laposa.mediaplayer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.laposa.mediaplayer"
-        minSdk = 24
+        minSdk = 22
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -90,7 +85,6 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.androidx.compose.runtime.livedata)
 
-    implementation(libs.embrace.swazzler)
     implementation(libs.embrace.android.sdk)
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
