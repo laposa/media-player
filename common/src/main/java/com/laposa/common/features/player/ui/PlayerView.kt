@@ -97,6 +97,7 @@ fun PlayerView(
             factory = { ctx ->
                 ExoPlayerView(ctx).apply {
                     player = exoPlayer
+                    keepScreenOn = true
                 }
             },
             modifier = Modifier
