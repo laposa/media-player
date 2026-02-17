@@ -34,7 +34,7 @@ fun ManualMediaSourceItem(
         mutableStateOf(false)
     }
 
-    val isDialogVisible = remember {
+    var isDialogVisible by remember {
         mutableStateOf(false)
     }
 
@@ -49,11 +49,11 @@ fun ManualMediaSourceItem(
     MediaSourceItemContent(
         index = 0, title = "", type = "ADD", icon = R.drawable.ic_add
     ) {
-        isDialogVisible.value = true
+        isDialogVisible = true
     }
 
-    if (isDialogVisible.value) {
-        Dialog(onDismissRequest = { isDialogVisible.value = false }) {
+    if (isDialogVisible) {
+        Dialog(onDismissRequest = { isDialogVisible = false }) {
             Box(modifier = Modifier
                 .padding(all = 16.dp)
                 .shadow(8.dp, shape = RectangleShape)) {
@@ -63,7 +63,7 @@ fun ManualMediaSourceItem(
                     error = error,
                     defaultValues = testDefaultValues,
                 ) {
-                    setScreenContent(null)
+                    isDialogVisible = false
                 }
             }
 
