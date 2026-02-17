@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.view.KeyEvent
 import android.view.SurfaceView
+import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.foundation.focusable
@@ -12,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.drawToBitmap
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -41,6 +44,20 @@ fun PlayerView(
     val context = LocalContext.current
 
     val exoPlayer = ExoPlayer.Builder(context).build()
+
+    var isControllerVisible by remember {
+        mutableStateOf(false)
+    }
+
+    val exoPlayerView = ExoPlayerView(context).apply {
+        player = exoPlayer
+        keepScreenOn = true
+    }.also {
+        it.setControllerVisibilityListener(ExoPlayerView.ControllerVisibilityListener { visibility ->
+            isControllerVisible = visibility == View.VISIBLE
+        })
+    }
+
 
     val mediaItem = remember(url) {
         url?.let {
@@ -88,23 +105,28 @@ fun PlayerView(
     }
 
     BackHandler {
-        dismiss()
+        if(isControllerVisible) {
+            dismiss()
+        } else {
+            exoPlayerView.showController()
+        }
     }
 
     Box {
-        AndroidView(factory = { ctx -> captureSurfaceView })
+        AndroidView(factory = { captureSurfaceView })
         AndroidView(
-            factory = { ctx ->
-                ExoPlayerView(ctx).apply {
-                    player = exoPlayer
-                    keepScreenOn = true
-                }
+            factory = {
+                exoPlayerView
             },
             modifier = Modifier
                 .focusable()
                 .fillMaxWidth()
                 .onKeyEvent { keyEvent ->
                     when (keyEvent.nativeKeyEvent.keyCode) {
+                        KeyEvent.KEYCODE_BACK -> {
+                            dismiss()
+                            true
+                        }
                         KeyEvent.KEYCODE_DPAD_CENTER -> {
                             when {
                                 exoPlayer.isPlaying -> {
