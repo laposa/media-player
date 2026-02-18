@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.KeyEvent
 import android.view.SurfaceView
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.foundation.focusable
@@ -52,9 +53,16 @@ fun PlayerView(
     val exoPlayerView = ExoPlayerView(context).apply {
         player = exoPlayer
         keepScreenOn = true
+        isFocusable = true
+        isFocusableInTouchMode = true
+        descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
     }.also {
         it.setControllerVisibilityListener(ExoPlayerView.ControllerVisibilityListener { visibility ->
             isControllerVisible = visibility == View.VISIBLE
+
+            if(visibility == View.VISIBLE) {
+                it.requestFocus()
+            }
         })
     }
 
