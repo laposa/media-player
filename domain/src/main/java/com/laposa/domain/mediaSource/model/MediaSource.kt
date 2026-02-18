@@ -21,7 +21,6 @@ data class MediaSource(
     val port: Int? = null,
     val isConnected: Boolean = false,
 ) : Parcelable {
-
     val key: String
         get() = "$type-$displayName-$connectionAddress"
 

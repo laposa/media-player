@@ -27,6 +27,7 @@ import androidx.tv.material3.MaterialTheme
 fun MediaSourceItemContent(
     index: Int,
     title: String,
+    subtitle: String,
     type: String,
     icon: Int,
     onClick: () -> Unit,
@@ -76,6 +77,15 @@ fun MediaSourceItemContent(
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Start,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
     }
 }

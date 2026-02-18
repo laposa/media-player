@@ -47,7 +47,7 @@ fun ManualMediaSourceItem(
     }
 
     MediaSourceItemContent(
-        index = 0, title = "", type = "ADD", icon = R.drawable.ic_add
+        index = 0, title = "", subtitle = "", type = "ADD", icon = R.drawable.ic_add
     ) {
         isDialogVisible = true
     }

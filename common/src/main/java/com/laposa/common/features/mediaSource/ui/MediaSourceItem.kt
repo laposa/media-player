@@ -110,6 +110,7 @@ fun MediaSourceItem(
     MediaSourceItemContent(
         index = index,
         title = mediaSource.displayName,
+        subtitle = mediaSource.connectionAddress.toString(),
         type = mediaSource.type.toString(),
         icon = R.drawable.smb_share,
         onClick = { onMediaSourceSelected() },
