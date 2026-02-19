@@ -11,6 +11,11 @@ on:
             options:
             - 'release'
             - 'debug'
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +29,15 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+
+      - name: Auto-increment TV version
+        run: ./gradlew :tv:incrementVersion
+
+      - name: Read new version code
+        id: version
+        run: |
+          source <(grep = tv/version.properties | tr -d ' ')
+          echo "versionCode=${versionCode}" >> $GITHUB_OUTPUT
 
       - name: Build APK
         if: github.event.inputs.buildType == 'debug'
@@ -44,3 +58,16 @@ jobs:
         with:
           name: tv-debug
           path: tv/build/outputs/apk/debug/tv-debug.apk
+
+      - name: Create version bump PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(tv): bump versionCode to ${{ steps.version.outputs.versionCode }}"
+          title: "chore(tv): bump versionCode to ${{ steps.version.outputs.versionCode }}"
+          body: |
+            Auto-generated versionCode bump for the TV module.
+            - **versionCode**: ${{ steps.version.outputs.versionCode }}
+          branch: chore/tv-version-bump-${{ steps.version.outputs.versionCode }}
+          base: ${{ github.ref_name }}
+          add-paths: tv/version.properties

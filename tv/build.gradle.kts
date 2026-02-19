@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -9,6 +11,33 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 
+val versionPropsFile = file("version.properties")
+val versionProps = Properties().apply {
+    if (versionPropsFile.exists()) {
+        versionPropsFile.inputStream().use { load(it) }
+    }
+}
+
+val appVersionCode = versionProps.getProperty("versionCode", "1").toInt()
+
+tasks.register("incrementVersion") {
+    group = "versioning"
+    description = "Increments the versionCode in version.properties"
+
+    doLast {
+        val props = Properties().apply {
+            versionPropsFile.inputStream().use { load(it) }
+        }
+
+        val newVersionCode = props.getProperty("versionCode", "1").toInt() + 1
+        props.setProperty("versionCode", newVersionCode.toString())
+
+        versionPropsFile.outputStream().use { props.store(it, null) }
+
+        println("versionCode incremented to $newVersionCode")
+    }
+}
+
 android {
     namespace = "com.laposa.mediaplayer"
     compileSdk = 36
@@ -17,8 +46,8 @@ android {
         applicationId = "com.laposa.mediaplayer"
         minSdk = 22
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = "1.0.0"
         vectorDrawables {
             useSupportLibrary = true
         }
