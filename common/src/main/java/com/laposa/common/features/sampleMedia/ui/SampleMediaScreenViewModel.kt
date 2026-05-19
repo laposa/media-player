@@ -37,6 +37,48 @@ class SampleMediaScreenViewModel @Inject constructor(
                 thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Spring_-_Blender_Open_Movie.webm/1920px--Spring_-_Blender_Open_Movie.webm.jpg",
                 type = MediaSourceType.URL
             ),
+            MediaSourceFile(
+                name = "Caminandes",
+                path = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Caminandes_-_Gran_Dillama_-_Blender_Foundation%27s_new_Open_Movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Caminandes_-_Gran_Dillama_-_Blender_Foundation%27s_new_Open_Movie.webm/1920px--Caminandes_-_Gran_Dillama_-_Blender_Foundation%27s_new_Open_Movie.webm.jpg",
+                type = MediaSourceType.URL
+            ),
+            MediaSourceFile(
+                name = "Charge",
+                path = "https://upload.wikimedia.org/wikipedia/commons/7/7a/Charge_-_Blender_Open_Movie-full_movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Charge_-_Blender_Open_Movie-full_movie.webm/1280px--Charge_-_Blender_Open_Movie-full_movie.webm.jpg",
+                type = MediaSourceType.URL
+            ),
+            MediaSourceFile(
+                name = "Coffee Run",
+                path = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Coffee_Run_-_Blender_Open_Movie-full_movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Coffee_Run_-_Blender_Open_Movie-full_movie.webm/1920px--Coffee_Run_-_Blender_Open_Movie-full_movie.webm.jpg",
+                type = MediaSourceType.URL
+            ),
+            MediaSourceFile(
+                name = "Cosmos Laundromat",
+                path = "https://upload.wikimedia.org/wikipedia/commons/3/36/Cosmos_Laundromat_-_First_Cycle_-_Official_Blender_Foundation_release.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Cosmos_Laundromat_-_First_Cycle_-_Official_Blender_Foundation_release.webm/1920px--Cosmos_Laundromat_-_First_Cycle_-_Official_Blender_Foundation_release.webm.jpg",
+                type = MediaSourceType.URL
+            ),
+            MediaSourceFile(
+                name = "Glass Half",
+                path = "https://upload.wikimedia.org/wikipedia/commons/0/02/Glass_Half_-_Blender_Open_Movie-full_movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Glass_Half_-_Blender_Open_Movie-full_movie.webm/1280px--Glass_Half_-_Blender_Open_Movie-full_movie.webm.jpg",
+                type = MediaSourceType.URL
+            ),
+            MediaSourceFile(
+                name = "Sprite Fight",
+                path = "https://upload.wikimedia.org/wikipedia/commons/7/76/Sprite_Fright_-_Blender_Open_Movie-full_movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Sprite_Fright_-_Blender_Open_Movie-full_movie.webm/1280px--Sprite_Fright_-_Blender_Open_Movie-full_movie.webm.jpg",
+                type = MediaSourceType.URL
+            ),
+            MediaSourceFile(
+                name = "Tears of Steel",
+                path = "https://upload.wikimedia.org/wikipedia/commons/1/10/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm/1280px--Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm.jpg",
+                type = MediaSourceType.URL
+            ),
         ),
     )
 
