@@ -15,26 +15,26 @@ class SampleMediaScreenViewModel @Inject constructor(
         listOf(
             MediaSourceFile(
                 name = "Big Buck Bunny",
-                path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+                path = "https://upload.wikimedia.org/wikipedia/commons/c/c0/Big_Buck_Bunny_4K.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Big_Buck_Bunny_4K.webm/1280px--Big_Buck_Bunny_4K.webm.jpg",
                 type = MediaSourceType.URL
             ),
             MediaSourceFile(
                 name = "Elephant Dream",
-                path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
+                path = "https://upload.wikimedia.org/wikipedia/commons/2/28/Elephants_Dream_%282006%29_1080p24.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Elephants_Dream_%282006%29_1080p24.webm/1280px--Elephants_Dream_%282006%29_1080p24.webm.jpg",
                 type = MediaSourceType.URL
             ),
             MediaSourceFile(
-                name = "For Bigger Blazes For Bigger Blazes For Bigger Blazes For Bigger Blazes",
-                path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
+                name = "Hero",
+                path = "https://upload.wikimedia.org/wikipedia/commons/a/a9/HERO_-_Blender_Open_Movie-full_movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/HERO_-_Blender_Open_Movie-full_movie.webm/1920px--HERO_-_Blender_Open_Movie-full_movie.webm.jpg",
                 type = MediaSourceType.URL
             ),
             MediaSourceFile(
-                name = "For Bigger Escape",
-                path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                thumbnailUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg",
+                name = "Spring",
+                path = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Spring_-_Blender_Open_Movie.webm",
+                thumbnailUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Spring_-_Blender_Open_Movie.webm/1920px--Spring_-_Blender_Open_Movie.webm.jpg",
                 type = MediaSourceType.URL
             ),
         ),
