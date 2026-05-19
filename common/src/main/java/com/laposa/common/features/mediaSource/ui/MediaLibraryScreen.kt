@@ -27,6 +27,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
+import com.laposa.common.features.common.composables.LoadingModal
 import com.laposa.common.features.common.composables.MyTextField
 import com.laposa.common.features.home.ui.LocalHomeNavigation
 import com.laposa.common.features.mediaLib.ui.MediaLibrary
@@ -47,9 +48,12 @@ fun MediaLibraryScreen(
     // and has never been connected (addAndConnectMediaSource ran on ViewModel A). Trigger
     // connect + content load automatically so the screen isn't empty on first show.
     val isConnected by viewModel.isConnected.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     LaunchedEffect(viewModel) {
         if (!isConnected) {
-            viewModel.connectToMediaSource()
+            viewModel.launch {
+                viewModel.connectToMediaSource()
+            }
         }
     }
 
@@ -140,4 +144,6 @@ fun MediaLibraryScreen(
         },
         onGoUp = viewModel::goUp
     )
+
+    LoadingModal(isLoading)
 }
