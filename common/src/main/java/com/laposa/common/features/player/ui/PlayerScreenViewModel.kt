@@ -1,16 +1,13 @@
 package com.laposa.common.features.player.ui
 
-import androidx.lifecycle.LiveData
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.laposa.common.features.common.ViewModelBase
-import com.laposa.domain.mediaSource.MediaSourceService
 import com.laposa.domain.mediaSource.MediaSourceServiceFactory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceType
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import com.laposa.domain.recents.RecentMedia
 import com.laposa.domain.recents.RecentMediaService
-import com.laposa.domain.savedState.SavedStateService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -44,8 +41,11 @@ class PlayerScreenViewModel @Inject constructor(
     }
 
     fun setFileToPlay(fileToPlay: MediaSourceFile) {
+        println("Full Path: ${fileToPlay.fullPath}")
         if(_currentMediaFile.value == fileToPlay) return
         _currentMediaFile.value = fileToPlay
+        _url.value = null
+        _payload.value = null
 
         launch {
             when (fileToPlay.type) {
@@ -55,8 +55,17 @@ class PlayerScreenViewModel @Inject constructor(
 
                 else -> {
                     val mediaSourceService = mediaSourceServiceFactory.getOrCreate(fileToPlay.type)
-                    val payload = mediaSourceService.getFile(fileToPlay.fullPath)
-                    _payload.value = payload
+                    
+                    // Try to get direct URL first (for VLC)
+                    val directUrl = mediaSourceService.getDirectUrl(fileToPlay.fullPath)
+                    println("Direct URL found: $directUrl")
+
+                    if (directUrl != null) {
+                        _url.value = directUrl
+                    } else {
+                        val payload = mediaSourceService.getFile(fileToPlay.fullPath)
+                        _payload.value = payload
+                    }
                 }
             }
         }

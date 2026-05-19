@@ -1,6 +1,7 @@
 package com.laposa.domain.mediaSource
 
 import androidx.lifecycle.SavedStateHandle
+import com.laposa.domain.mediaSource.local.LocalMediaProvider
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceType
@@ -76,6 +77,10 @@ class MediaSourceService(
         return provider.getFile(fileName)
     }
 
+    suspend fun getDirectUrl(fileName: String): String? {
+        return provider.getDirectUrl(fileName)
+    }
+
 
     suspend fun connectToMediaSource(
         mediaSource: MediaSource,
@@ -137,6 +142,7 @@ class MediaSourceServiceFactory(
     private val sambaMediaProvider: SambaMediaProvider,
     private val nfsMediaProvider: NfsMediaProvider,
     private val sftpMediaProvider: SftpMediaProvider,
+    private val localMediaProvider: LocalMediaProvider,
 ) {
     private var instances: MutableMap<String, MediaSourceService> = mutableMapOf()
 
@@ -169,7 +175,8 @@ class MediaSourceServiceFactory(
             MediaSourceType.SMB -> sambaMediaProvider
             MediaSourceType.NSF -> nfsMediaProvider
             MediaSourceType.SFTP -> sftpMediaProvider
-            else -> throw IllegalArgumentException("Unknown media source type")
+            MediaSourceType.LOCAL_FILE -> localMediaProvider
+            else -> throw IllegalArgumentException("Unknown media source type: $mediaSourceType")
         }
     }
 
@@ -177,4 +184,3 @@ class MediaSourceServiceFactory(
         const val INSTANCES_MAP_KEY = "MediaSourceServiceFactory"
     }
 }
-

@@ -9,6 +9,7 @@ import com.hierynomus.smbj.SMBClient
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.session.Session
 import com.hierynomus.smbj.share.DiskShare
+import com.hierynomus.smbj.share.PipeShare
 import com.laposa.domain.mediaSource.model.MediaSource
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
 import com.laposa.domain.mediaSource.model.MediaSourceFile
@@ -18,8 +19,10 @@ import com.laposa.domain.mediaSource.model.MediaSourceType
 import com.laposa.domain.networkProtocols.AuthFailException
 import com.laposa.domain.networkProtocols.ConnectionFailedException
 import com.laposa.domain.networkProtocols.mediaFileExtensionsList
+import com.rapid7.client.dcerpc.Interface
 import com.rapid7.client.dcerpc.mssrvs.ServerService
 import com.rapid7.client.dcerpc.transport.SMBTransportFactories
+import com.rapid7.helper.smbj.share.NamedPipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -31,6 +34,10 @@ class SmbService {
 
     private var _currentShare: DiskShare? = null
 
+    /** True when both IOCTL and WRITE+READ SRVSVC transports failed for the current session. */
+    var shareEnumerationFailed: Boolean = false
+        private set
+
     suspend fun connect(
         mediaSource: MediaSource,
         userName: String? = null,
@@ -38,6 +45,7 @@ class SmbService {
         port: Int = 445,
     ) = withContext(Dispatchers.IO) {
         _currentMediaSource = mediaSource
+        shareEnumerationFailed = false
         try {
             val connection = client.connect(mediaSource.connectionAddress, port)
             val authContext =
@@ -49,20 +57,49 @@ class SmbService {
 
             _currentSession = connection.authenticate(authContext)
 
-            val transport = SMBTransportFactories.SRVSVC.getTransport(_currentSession)
-            val serverService = ServerService(transport)
+            try {
+                val transport = SMBTransportFactories.SRVSVC.getTransport(_currentSession)
+                val serverService = ServerService(transport)
 
-            val shares = serverService.shares0
+                val shares = serverService.shares0
 
-            for (share in shares) {
-                if (!share.netName.contains("$")) {
-                    val currentMediaSourceShares = _currentShares[mediaSource] ?: emptyList()
-                    _currentShares[mediaSource] =
-                        (currentMediaSourceShares + share.netName).distinct()
+                for (share in shares) {
+                    if (!share.netName.contains("$")) {
+                        val currentMediaSourceShares = _currentShares[mediaSource] ?: emptyList()
+                        _currentShares[mediaSource] =
+                            (currentMediaSourceShares + share.netName).distinct()
+                    }
+                }
+            } catch (ioctlException: Exception) {
+                // FSCTL_PIPE_TRANSCEIVE (IOCTL) is denied by this server. Retry using
+                // separate SMB2_WRITE + SMB2_READ on the named pipe — the original
+                // DCE/RPC named pipe protocol that all Samba versions support.
+                println("SRVSVC via IOCTL failed, retrying with WRITE+READ transport: ${ioctlException.message}")
+                try {
+                    val session = _currentSession!!
+                    val ipcShare = session.connectShare("IPC$") as PipeShare
+                    val pipe = NamedPipe(session, ipcShare, "srvsvc")
+                    val transport = WriteReadSMBTransport(pipe)
+                    transport.bind(Interface.SRVSVC_V3_0, Interface.NDR_32BIT_V2)
+                    val serverService = ServerService(transport)
+
+                    val shares = serverService.shares0
+
+                    for (share in shares) {
+                        if (!share.netName.contains("$")) {
+                            val currentMediaSourceShares = _currentShares[mediaSource] ?: emptyList()
+                            _currentShares[mediaSource] =
+                                (currentMediaSourceShares + share.netName).distinct()
+                        }
+                    }
+                } catch (writeReadException: Exception) {
+                    // Neither transport works — continue without share enumeration.
+                    println("SMB share enumeration failed on both transports (continuing): ${writeReadException.message}")
+                    shareEnumerationFailed = true
                 }
             }
 
-            // Try to connect to some share to find out if current authentication have enough permissions
+            // Try to connect to some share to verify the session has enough permissions
             _currentShares.values.firstOrNull()?.let {
                 _currentSession?.connectShare(it.first())
             }
@@ -131,11 +168,7 @@ class SmbService {
         return withContext(Dispatchers.IO) {
             if (_currentShare == null || _currentShare?.smbPath?.shareName != shareName) {
                 _currentShare?.close()
-                try {
-                    _currentShare = (_currentSession?.connectShare(shareName) as DiskShare)
-                } catch (exception: Exception) {
-                    println(exception.message)
-                }
+                _currentShare = _currentSession?.connectShare(shareName) as DiskShare
             }
             getContentOfDirectoryAtPathInner("/")
         }

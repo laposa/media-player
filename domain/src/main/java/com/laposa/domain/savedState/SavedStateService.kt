@@ -90,10 +90,24 @@ class SavedStateService(
         }
     }
 
+    fun addManualSmbShare(serverKey: String, shareName: String) {
+        sharedPreferences.edit(commit = true) {
+            val current = getManualSmbShares(serverKey).toMutableSet()
+            current.add(shareName)
+            putStringSet("$KEY_MANUAL_SMB_SHARES_PREFIX$serverKey", current)
+        }
+    }
+
+    fun getManualSmbShares(serverKey: String): Set<String> {
+        return sharedPreferences.getStringSet("$KEY_MANUAL_SMB_SHARES_PREFIX$serverKey", null)
+            ?: emptySet()
+    }
+
     companion object {
         private const val KEY_SELECTED_MEDIA = "selectedMedia"
         private const val KEY_SELECTED_INPUT_STREAM_DATA_SOURCE = "selectedInputStreamDataSource"
         private const val KEY_RECENT_MEDIA = "recentMedia"
         private const val KEY_SAVED_MEDIA_SOURCES = "savedMediaSources"
+        private const val KEY_MANUAL_SMB_SHARES_PREFIX = "manualSmbShares_"
     }
 }

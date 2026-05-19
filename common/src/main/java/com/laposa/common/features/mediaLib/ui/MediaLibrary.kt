@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
+import com.laposa.domain.mediaSource.model.MediaSourceEnterShareName
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceGoUp
@@ -33,6 +34,7 @@ fun MediaLibrary(
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onEnterShareNameSelect: () -> Unit = {},
     onGoUp: () -> Unit,
 ) {
     val currentFiles = files.collectAsState().value
@@ -46,6 +48,7 @@ fun MediaLibrary(
         onMediaFileSelect,
         onMediaDirectorySelect,
         onMediaShareSelect,
+        onEnterShareNameSelect,
         onGoUp
     )
 }
@@ -60,6 +63,7 @@ fun MediaLibrary(
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onEnterShareNameSelect: () -> Unit = {},
     onGoUp: () -> Unit,
 ) {
     MediaLibraryInner(
@@ -71,6 +75,7 @@ fun MediaLibrary(
         onMediaFileSelect,
         onMediaDirectorySelect,
         onMediaShareSelect,
+        onEnterShareNameSelect,
         onGoUp
     )
 }
@@ -85,6 +90,7 @@ private fun MediaLibraryInner(
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onEnterShareNameSelect: () -> Unit = {},
     onGoUp: () -> Unit,
 ) {
 
@@ -131,6 +137,7 @@ private fun MediaLibraryInner(
                         onMediaFileSelect,
                         onMediaDirectorySelect,
                         onMediaShareSelect,
+                        onEnterShareNameSelect,
                         onGoUp
                     )
                 }
@@ -144,6 +151,7 @@ private fun onMediaSelect(
     onMediaFileSelect: (MediaSourceFile) -> Unit,
     onMediaDirectorySelect: (MediaSourceDirectory) -> Unit,
     onMediaShareSelect: (MediaSourceShare) -> Unit,
+    onEnterShareNameSelect: () -> Unit,
     onGoUpSelect: () -> Unit,
 ) {
     when (media) {
@@ -157,6 +165,10 @@ private fun onMediaSelect(
 
         is MediaSourceShare -> {
             onMediaShareSelect(media)
+        }
+
+        is MediaSourceEnterShareName -> {
+            onEnterShareNameSelect()
         }
 
         is MediaSourceGoUp -> {

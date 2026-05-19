@@ -19,6 +19,10 @@ abstract class MediaSourceProvider {
         fileName: String
     ): InputStreamDataSourcePayload?
 
+    abstract suspend fun getDirectUrl(
+        fileName: String
+    ): String?
+
     abstract suspend fun openShare(shareName: String): List<MediaSourceFileBase>
 
     abstract suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase>

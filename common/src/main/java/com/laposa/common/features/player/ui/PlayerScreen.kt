@@ -34,7 +34,7 @@ fun PlayerScreen(
     viewModel: PlayerScreenViewModel = hiltViewModel()
 ) {
     viewModel.setFileToPlay(fileToPlay)
-
+    val mediaFile = viewModel.currentMediaFile.collectAsState().value
     val fileName = viewModel.currentMediaFile.collectAsState().value?.name ?: ""
     val url = viewModel.url.collectAsState().value
     val payload = viewModel.payload.collectAsState().value
@@ -68,23 +68,22 @@ fun PlayerScreen(
                 .background(surfaceDark),
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
-            url?.let {
+            if (mediaFile != null && url != null) {
+                VlcPlayerView(
+                    mediaSourceFile = mediaFile,
+                    url = url,
+                    dismiss = ::onDismiss,
+                    saveThumbnail = ::saveThumbnail
+                )
+            } else if (payload != null) {
                 PlayerView(
                     fileName = fileName,
-                    url = it,
+                    payload = payload,
                     shouldDismiss = shouldDismiss,
                     dismiss = ::onDismiss,
                     saveThumbnail = ::saveThumbnail
                 )
-            } ?: payload?.let {
-                PlayerView(
-                    fileName = fileName,
-                    payload = it,
-                    shouldDismiss = shouldDismiss,
-                    dismiss = ::onDismiss,
-                    saveThumbnail = ::saveThumbnail
-                )
-            } ?: run {
+            } else {
                 Column {
                     Text("No media selected", style = VideoPlayerTypography.titleSmall)
                 }

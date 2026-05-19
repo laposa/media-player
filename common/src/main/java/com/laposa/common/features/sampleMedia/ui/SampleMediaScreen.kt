@@ -30,16 +30,6 @@ fun SampleMediaScreen(
     }
 
     Column {
-        MediaLibrary(
-            "Samples",
-            viewModel.media,
-            "",
-            columnBaseSize = 128,
-            1,
-            ::onMediaSelected,
-            ::onDirectorySelected,
-            ::onShareSelected,
-            ::onGoUp,
-        )
+
     }
 }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.SavedStateHandle
 import com.laposa.domain.mediaSource.MediaSourceService
 import com.laposa.domain.mediaSource.MediaSourceServiceFactory
+import com.laposa.domain.mediaSource.local.LocalMediaProvider
 import com.laposa.domain.mediaSource.nfs.NfsMediaProvider
 import com.laposa.domain.mediaSource.samba.SambaMediaProvider
 import com.laposa.domain.mediaSource.sftp.SftpMediaProvider
@@ -102,6 +103,12 @@ object DomainModule {
         return SftpMediaProvider(sftpService)
     }
 
+    @Singleton
+    @Provides
+    fun provideLocalMediaProvider(): LocalMediaProvider {
+        return LocalMediaProvider()
+    }
+
     @Provides
     fun provideMediaSourceServiceFactory(
         savedStateHandle: SavedStateHandle,
@@ -110,6 +117,7 @@ object DomainModule {
         sambaMediaProvider: SambaMediaProvider,
         nfsMediaProvider: NfsMediaProvider,
         sftpMediaProvider: SftpMediaProvider,
+        localMediaProvider: LocalMediaProvider,
     ): MediaSourceServiceFactory {
         return MediaSourceServiceFactory(
             savedStateHandle,
@@ -118,6 +126,7 @@ object DomainModule {
             sambaMediaProvider,
             nfsMediaProvider,
             sftpMediaProvider,
+            localMediaProvider,
         )
     }
 

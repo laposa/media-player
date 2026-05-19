@@ -27,6 +27,7 @@ import androidx.tv.material3.MaterialTheme
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.laposa.domain.mediaSource.model.MediaSourceDirectory
+import com.laposa.domain.mediaSource.model.MediaSourceEnterShareName
 import com.laposa.domain.mediaSource.model.MediaSourceFile
 import com.laposa.domain.mediaSource.model.MediaSourceFileBase
 import com.laposa.domain.mediaSource.model.MediaSourceGoUp
@@ -117,6 +118,7 @@ fun getMediaItemIconId(media: MediaSourceFileBase): Int {
         is MediaSourceFile -> R.drawable.ic_media
         is MediaSourceDirectory -> R.drawable.ic_folder
         is MediaSourceShare -> R.drawable.smb_share
+        is MediaSourceEnterShareName -> R.drawable.ic_add
         is MediaSourceGoUp -> R.drawable.ic_move_up
         else -> R.drawable.ic_block
     }

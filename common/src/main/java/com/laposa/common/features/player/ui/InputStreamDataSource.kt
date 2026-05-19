@@ -17,7 +17,7 @@ import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 import java.io.IOException
 import java.io.InputStream
 
-const val TAG = "InputStreamDataSource"
+private const val TAG = "InputStreamDataSource"
 
 @OptIn(UnstableApi::class)
 class InputStreamDataSource(

@@ -21,13 +21,14 @@ hiltNavigationCompose = "1.2.0"
 media3Exoplayer = "1.5.0"
 media3Ui = "1.5.0"
 glide = "1.0.0-beta01"
-dcerpc = "0.12.1"
+dcerpc = "0.12.13"
 nfsClient = "1.1.0"
 appacheCommons = "2.9.0"
 gson = "2.11.0"
 jsch = "0.1.55"
 embrace-swazzler = "6.13.0"
 navigationCommonKtx = "2.8.5"
+libvlc = "3.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +68,8 @@ jsch = { group = "com.jcraft", name = "jsch", version.ref = "jsch" }
 embrace-android-sdk = { group = "io.embrace", name = "embrace-android-sdk", version.ref = "embrace-swazzler" }
 embrace-swazzler = { group = "io.embrace", name = "embrace-swazzler", version.ref = "embrace-swazzler" }
 androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
+libvlc = { group = "org.videolan.android", name = "libvlc-all", version.ref = "libvlc" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

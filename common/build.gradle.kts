@@ -68,5 +68,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.gson)
 
+    implementation(libs.libvlc)
+
     implementation(project(":domain"))
 }

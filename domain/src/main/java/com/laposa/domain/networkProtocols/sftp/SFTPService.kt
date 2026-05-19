@@ -37,6 +37,7 @@ class SFTPService {
 
             println("Connected to $host:$port as $user")
         } catch (exception: Exception) {
+            println(exception.message)
             when {
                 exception.message?.contains("Auth fail") == true -> throw AuthFailException()
                 else -> throw ConnectionFailedException()
