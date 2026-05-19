@@ -100,10 +100,19 @@ class MediaSourceService(
 
     suspend fun tryToConnectToMediaSource(mediaSource: MediaSource): Boolean {
         return provider.let {
-            if (!it.connectToMediaSourceAsAGuest(mediaSource)) {
-                if (!it.connectToMediaSourceWithRememberedLogin(mediaSource)) {
-                    return@let false
+            val guestSuccess = try {
+                it.connectToMediaSourceAsAGuest(mediaSource)
+            } catch (e: Exception) {
+                false
+            }
+
+            if (!guestSuccess) {
+                val rememberedSuccess = try {
+                    it.connectToMediaSourceWithRememberedLogin(mediaSource)
+                } catch (e: Exception) {
+                    false
                 }
+                if (!rememberedSuccess) return@let false
             }
 
             markMediaSourceAsConnected(mediaSource)
