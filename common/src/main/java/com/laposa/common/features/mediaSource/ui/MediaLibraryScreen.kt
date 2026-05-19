@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,16 @@ fun MediaLibraryScreen(
     val homeNavigation = LocalHomeNavigation.current
     val mediaSourceItemViewModelFactory = LocalMediaSourceItemViewModelFactory.current
     val viewModel: MediaSourceItemViewModel = mediaSourceItemViewModelFactory.create(mediaSource)
+
+    // When arriving here directly from AddConnectionDialog, ViewModel B is freshly created
+    // and has never been connected (addAndConnectMediaSource ran on ViewModel A). Trigger
+    // connect + content load automatically so the screen isn't empty on first show.
+    val isConnected by viewModel.isConnected.collectAsState()
+    LaunchedEffect(viewModel) {
+        if (!isConnected) {
+            viewModel.connectToMediaSource()
+        }
+    }
 
     var showShareNameDialog by remember { mutableStateOf(false) }
     var shareNameInput by remember { mutableStateOf("") }
