@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 val mediaTypeSettings = mapOf(
     MediaSourceType.SFTP to listOf("connectionName", "hostName", "port", "userName", "password"),
     MediaSourceType.SMB to listOf("connectionName", "hostName", "userName", "password"),
+    MediaSourceType.NSF to listOf("connectionName", "hostName"),
 )
 
 @Composable
@@ -156,7 +157,7 @@ fun AddConnectionDialog(
                             value = connectionType,
                             title = "Connection Type",
                             getOptionTitle = { it.name },
-                            options = listOf(MediaSourceType.SFTP, MediaSourceType.SMB),
+                            options = listOf(MediaSourceType.SFTP, MediaSourceType.SMB, MediaSourceType.NSF),
                             focusRequester = initialFocusRequester,
                         ) {
                             connectionType = it
@@ -187,8 +188,22 @@ fun AddConnectionDialog(
                             visible = currentSettings.contains("hostName"),
                             value = hostName,
                             onValueChange = { hostName = it },
-                            placeholder = { Text("0.0.0.0") },
-                            label = { Text("Host name") },
+                            placeholder = {
+                                Text(
+                                    if (connectionType == MediaSourceType.NSF)
+                                        "192.168.1.1:/mnt/media"
+                                    else
+                                        "0.0.0.0"
+                                )
+                            },
+                            label = {
+                                Text(
+                                    if (connectionType == MediaSourceType.NSF)
+                                        "Server & Export (host:/path)"
+                                    else
+                                        "Host name"
+                                )
+                            },
                             colors = ComponentsTheme.textInputColors(),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(

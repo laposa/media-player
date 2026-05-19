@@ -7,41 +7,36 @@ import com.laposa.domain.networkProtocols.nfs.NfsService
 import com.laposa.domain.networkProtocols.smb.InputStreamDataSourcePayload
 
 class NfsMediaProvider(
-    private val nfsService: NfsService
+    private val nfsService: NfsService,
 ) : MediaSourceProvider() {
-    private var currentMediaSource: MediaSource? = null
 
     override suspend fun connectToMediaSourceAsAGuest(mediaSource: MediaSource): Boolean {
-        return true
+        return nfsService.connect(mediaSource)
     }
 
     override suspend fun connectToMediaSourceWithRememberedLogin(mediaSource: MediaSource): Boolean {
-        return true
+        return nfsService.connect(mediaSource)
     }
 
     override suspend fun connectToMediaSource(
         mediaSource: MediaSource,
         remember: Boolean,
     ): Boolean {
-        currentMediaSource = mediaSource
-        return true
+        return nfsService.connect(mediaSource)
     }
 
-    override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? {
-        return null
+    override suspend fun getFile(fileName: String): InputStreamDataSourcePayload? = null
+
+    override suspend fun getDirectUrl(fileName: String): String {
+        return nfsService.getDirectUrl(fileName)
     }
 
-    override suspend fun getDirectUrl(fileName: String): String? {
-        val ms = currentMediaSource ?: return null
-        val path = if (fileName.startsWith("/")) fileName else "/$fileName"
-        return "nfs://${ms.connectionAddress}$path"
-    }
-
+    /** NFS has no concept of sub-shares; the export root is the top level. */
     override suspend fun openShare(shareName: String): List<MediaSourceFileBase> {
-        return emptyList()
+        return nfsService.getContentOfDirectoryAtPath("/")
     }
 
     override suspend fun getContentOfDirectoryAtPath(path: String): List<MediaSourceFileBase> {
-        return emptyList()
+        return nfsService.getContentOfDirectoryAtPath(path)
     }
 }
