@@ -3,6 +3,12 @@ package com.laposa.common.features.player.ui
 import android.graphics.Bitmap
 import android.util.Log.e
 import android.view.KeyEvent
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.mutableFloatStateOf
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.ViewGroup
@@ -55,6 +61,7 @@ fun VlcPlayerView(
 
     // ── UI state ────────────────────────────────────────────────────────────
     var isPlaying by remember { mutableStateOf(false) }
+    var isBuffering by remember { mutableStateOf(false) }
     var positionMs by remember { mutableLongStateOf(0L) }
     var durationMs by remember { mutableLongStateOf(0L) }
     var showControls by remember { mutableStateOf(false) }
@@ -111,7 +118,8 @@ fun VlcPlayerView(
         val listener = MediaPlayer.EventListener { event ->
             scope.launch {
                 when (event.type) {
-                    MediaPlayer.Event.Playing -> isPlaying = true
+                    MediaPlayer.Event.Playing -> { isPlaying = true; isBuffering = false }
+                    MediaPlayer.Event.Buffering -> isBuffering = event.buffering < 100f
                     MediaPlayer.Event.Paused,
                     MediaPlayer.Event.Stopped -> isPlaying = false
                     MediaPlayer.Event.TimeChanged -> positionMs = event.timeChanged
@@ -126,6 +134,7 @@ fun VlcPlayerView(
     // ── Start playback ──────────────────────────────────────────────────────
     LaunchedEffect(url) {
         url?.let {
+            isBuffering = true
             println("Playing URL: $it")
             val vout = mediaPlayer.vlcVout
             vout.setVideoView(videoSurfaceView)
@@ -206,6 +215,17 @@ fun VlcPlayerView(
             factory = { videoSurfaceView },
             modifier = Modifier.fillMaxSize(),
         )
+
+        if (isBuffering) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(64.dp)
+                    .align(Alignment.Center),
+                color = Color.White,
+                trackColor = Color.White.copy(alpha = 0.2f),
+                strokeWidth = 4.dp,
+            )
+        }
 
         VlcPlayerControls(
             visible = showControls,
