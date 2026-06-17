@@ -51,13 +51,13 @@ jobs:
         if: github.event.inputs.buildType == 'release'
         with:
           name: tv-release
-          path: tv/build/outputs/apk/release/tv-release.apk
+          path: tv/build/outputs/apk/release/*.apk
 
       - uses: actions/upload-artifact@v4
         if: github.event.inputs.buildType == 'debug'
         with:
           name: tv-debug
-          path: tv/build/outputs/apk/debug/tv-debug.apk
+          path: tv/build/outputs/apk/debug/*.apk
 
       - name: Create version bump PR
         uses: peter-evans/create-pull-request@v5
