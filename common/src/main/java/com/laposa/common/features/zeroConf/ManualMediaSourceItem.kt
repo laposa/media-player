@@ -73,9 +73,9 @@ fun ManualMediaSourceItem(
 }
 
 val testDefaultValues = mapOf(
-    "name" to "Test",
-    "hostName" to "192.168.31.226",
-    "userName" to "laposa",
-    "password" to "Test1234",
-    "port" to "22",
+    "name" to "Norbert",
+    "hostName" to "rochester.laposa.ie",
+    "userName" to "mediaplayer",
+    "password" to "Laposa77",
+    "port" to "17022",
 )

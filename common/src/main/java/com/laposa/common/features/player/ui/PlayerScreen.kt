@@ -73,16 +73,7 @@ fun PlayerScreen(
                     mediaSourceFile = mediaFile,
                     url = url,
                     dismiss = ::onDismiss,
-                    saveThumbnail = ::saveThumbnail
-                )
-            } else if (payload != null) {
-                PlayerView(
-                    fileName = fileName,
-                    payload = payload,
-                    shouldDismiss = shouldDismiss,
-                    dismiss = ::onDismiss,
-                    saveThumbnail = ::saveThumbnail
-                )
+                    saveThumbnail = ::saveThumbnail,)
             } else {
                 Column {
                     Text("No media selected", style = VideoPlayerTypography.titleSmall)
